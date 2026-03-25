@@ -7,6 +7,11 @@ from uuid import uuid4
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, send_file, url_for
 from openpyxl import Workbook
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 app = Flask(__name__)
@@ -30,6 +35,15 @@ STATUS_META = {
     "production": {
         "label": "Produzione",
         "tone": "production",
+    },
+}
+
+CR_TYPE_META = {
+    "workbench": {
+        "label": "Workbench",
+    },
+    "customizing": {
+        "label": "Customizing",
     },
 }
 
@@ -69,6 +83,48 @@ def normalize_status(raw_value: str) -> str:
     return "development"
 
 
+def normalize_cr_type(raw_value: str) -> str:
+    candidate = sanitize_text(raw_value).lower()
+    if candidate in CR_TYPE_META:
+        return candidate
+    return "workbench"
+
+
+def normalize_release_order(raw_value, fallback: int = 9999) -> int:
+    try:
+        parsed = int(raw_value)
+    except (TypeError, ValueError):
+        return fallback
+    if parsed < 1:
+        return fallback
+    return parsed
+
+
+def sort_crs_for_execution(crs: list[dict]) -> list[dict]:
+    return sorted(
+        crs,
+        key=lambda item: (
+            normalize_release_order(item.get("release_order")),
+            item.get("updated_at", ""),
+            sanitize_text(item.get("cr_key")).lower(),
+        ),
+    )
+
+
+def next_release_order(project: dict) -> int:
+    orders = [normalize_release_order(cr.get("release_order"), fallback=0) for cr in project.get("crs", [])]
+    return (max(orders) + 1) if orders else 1
+
+
+def has_release_order_conflict(project: dict, release_order: int, exclude_cr_id: str | None = None) -> bool:
+    for item in project.get("crs", []):
+        if exclude_cr_id and item.get("id") == exclude_cr_id:
+            continue
+        if normalize_release_order(item.get("release_order")) == release_order:
+            return True
+    return False
+
+
 def normalize_cr(raw_cr: dict) -> dict:
     created_at = sanitize_text(raw_cr.get("created_at")) or now_iso()
     updated_at = sanitize_text(raw_cr.get("updated_at")) or created_at
@@ -79,6 +135,8 @@ def normalize_cr(raw_cr: dict) -> dict:
         "description": sanitize_text(raw_cr.get("description")),
         "notes": sanitize_text(raw_cr.get("notes")),
         "status": normalize_status(raw_cr.get("status")),
+        "cr_type": normalize_cr_type(raw_cr.get("cr_type")),
+        "release_order": normalize_release_order(raw_cr.get("release_order")),
         "created_at": created_at,
         "updated_at": updated_at,
     }
@@ -148,8 +206,11 @@ def count_statuses(clients: list[dict]) -> dict:
     return counts
 
 
-def matches_filters(cr: dict, search_text: str, status_filter: str) -> bool:
+def matches_filters(cr: dict, search_text: str, status_filter: str, type_filter: str = "all") -> bool:
     if status_filter != "all" and normalize_status(cr.get("status")) != status_filter:
+        return False
+
+    if type_filter != "all" and normalize_cr_type(cr.get("cr_type")) != type_filter:
         return False
 
     if not search_text:
@@ -187,6 +248,7 @@ def build_filter_options(data: dict) -> dict:
     return {
         "clients": client_names,
         "projects": project_names,
+        "cr_types": [CR_TYPE_META["workbench"]["label"], CR_TYPE_META["customizing"]["label"]],
     }
 
 
@@ -210,14 +272,18 @@ def build_export_rows(
     status_filter: str = "all",
     client_filter: str = "all",
     project_filter: str = "all",
+    type_filter: str = "all",
 ) -> list[dict]:
     data = load_data()
     normalized_search = sanitize_text(search_text).lower()
     normalized_status = sanitize_text(status_filter).lower() or "all"
     normalized_client = normalize_filter_value(client_filter) or "all"
     normalized_project = normalize_filter_value(project_filter) or "all"
+    normalized_type = normalize_filter_value(type_filter) or "all"
     if normalized_status != "all" and normalized_status not in STATUS_META:
         normalized_status = "all"
+    if normalized_type != "all" and normalized_type not in CR_TYPE_META:
+        normalized_type = "all"
 
     rows: list[dict] = []
     sorted_clients = sorted(data["clients"], key=lambda item: item.get("name", "").lower())
@@ -232,20 +298,19 @@ def build_export_rows(
             if normalized_project != "all" and project_name.lower() != normalized_project:
                 continue
 
-            sorted_crs = sorted(
-                project.get("crs", []),
-                key=lambda item: (item.get("updated_at", ""), item.get("cr_key", "")),
-                reverse=True,
-            )
+            sorted_crs = sort_crs_for_execution(project.get("crs", []))
             for cr in sorted_crs:
-                if not matches_filters(cr, normalized_search, normalized_status):
+                if not matches_filters(cr, normalized_search, normalized_status, normalized_type):
                     continue
 
                 status = normalize_status(cr.get("status"))
+                cr_type = normalize_cr_type(cr.get("cr_type"))
                 rows.append(
                     {
                         "client": client_name,
                         "project": project_name,
+                        "release_order": normalize_release_order(cr.get("release_order")),
+                        "cr_type": CR_TYPE_META[cr_type]["label"],
                         "cr_key": sanitize_text(cr.get("cr_key")),
                         "created_by": sanitize_text(cr.get("created_by")),
                         "description": sanitize_text(cr.get("description")),
@@ -257,6 +322,45 @@ def build_export_rows(
                 )
 
     return rows
+
+
+def build_project_export_rows(client_id: str, project_id: str) -> dict:
+    data = load_data()
+    client = find_client(data, client_id)
+    if client is None:
+        raise ValueError("Cliente non trovato.")
+
+    project = find_project(client, project_id)
+    if project is None:
+        raise ValueError("Progetto non trovato.")
+
+    client_name = sanitize_text(client.get("name"))
+    project_name = sanitize_text(project.get("name"))
+    sorted_crs = sort_crs_for_execution(project.get("crs", []))
+
+    rows = []
+    for cr in sorted_crs:
+        status = normalize_status(cr.get("status"))
+        cr_type = normalize_cr_type(cr.get("cr_type"))
+        rows.append(
+            {
+                "release_order": normalize_release_order(cr.get("release_order")),
+                "cr_type": CR_TYPE_META[cr_type]["label"],
+                "cr_key": sanitize_text(cr.get("cr_key")),
+                "created_by": sanitize_text(cr.get("created_by")),
+                "description": sanitize_text(cr.get("description")),
+                "notes": sanitize_text(cr.get("notes")),
+                "status": STATUS_META[status]["label"],
+                "created_at": sanitize_text(cr.get("created_at")).replace("T", " "),
+                "updated_at": sanitize_text(cr.get("updated_at")).replace("T", " "),
+            }
+        )
+
+    return {
+        "client_name": client_name,
+        "project_name": project_name,
+        "rows": rows,
+    }
 
 
 def autosize_worksheet_columns(worksheet) -> None:
@@ -274,12 +378,14 @@ def build_excel_workbook(
     status_filter: str = "all",
     client_filter: str = "all",
     project_filter: str = "all",
+    type_filter: str = "all",
 ) -> io.BytesIO:
     rows = build_export_rows(
         search_text=search_text,
         status_filter=status_filter,
         client_filter=client_filter,
         project_filter=project_filter,
+        type_filter=type_filter,
     )
 
     workbook = Workbook()
@@ -289,6 +395,8 @@ def build_excel_workbook(
     headers = [
         "Cliente",
         "Progetto",
+        "Ordine",
+        "Tipo CR",
         "ID CR",
         "Creata da",
         "Descrizione",
@@ -307,6 +415,8 @@ def build_excel_workbook(
             [
                 row["client"],
                 row["project"],
+                row["release_order"],
+                row["cr_type"],
                 row["cr_key"],
                 row["created_by"],
                 row["description"],
@@ -326,19 +436,165 @@ def build_excel_workbook(
     return output
 
 
+def build_project_excel_workbook(client_id: str, project_id: str) -> io.BytesIO:
+    payload = build_project_export_rows(client_id, project_id)
+    rows = payload["rows"]
+
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "CR Progetto"
+
+    worksheet.append(["Cliente", payload["client_name"]])
+    worksheet.append(["Progetto", payload["project_name"]])
+    worksheet.append(["Generato il", datetime.now().strftime("%d/%m/%Y %H:%M")])
+    worksheet.append([])
+
+    headers = [
+        "Ordine",
+        "Tipo CR",
+        "ID CR",
+        "Creata da",
+        "Descrizione",
+        "Note",
+        "Stato",
+        "Creata il",
+        "Aggiornata il",
+    ]
+    worksheet.append(headers)
+
+    header_row_index = worksheet.max_row
+    for cell in worksheet[header_row_index]:
+        cell.font = cell.font.copy(bold=True)
+
+    for row in rows:
+        worksheet.append(
+            [
+                row["release_order"],
+                row["cr_type"],
+                row["cr_key"],
+                row["created_by"],
+                row["description"],
+                row["notes"],
+                row["status"],
+                row["created_at"],
+                row["updated_at"],
+            ]
+        )
+
+    worksheet.freeze_panes = f"A{header_row_index + 1}"
+    autosize_worksheet_columns(worksheet)
+
+    output = io.BytesIO()
+    workbook.save(output)
+    output.seek(0)
+    return output
+
+
+def build_project_pdf_document(client_id: str, project_id: str) -> io.BytesIO:
+    payload = build_project_export_rows(client_id, project_id)
+    rows = payload["rows"]
+
+    output = io.BytesIO()
+    document = SimpleDocTemplate(
+        output,
+        pagesize=landscape(A4),
+        leftMargin=12 * mm,
+        rightMargin=12 * mm,
+        topMargin=12 * mm,
+        bottomMargin=12 * mm,
+        title=f"CR_{payload['project_name']}",
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "ProjectTitle",
+        parent=styles["Title"],
+        fontSize=22,
+        textColor=colors.HexColor("#0f766e"),
+        spaceAfter=6,
+    )
+    meta_style = ParagraphStyle(
+        "Meta",
+        parent=styles["Normal"],
+        fontSize=10,
+        textColor=colors.HexColor("#374151"),
+        leading=14,
+    )
+
+    story = [
+        Paragraph("SAP CR Manager - Export Progetto", title_style),
+        Paragraph(f"<b>Cliente:</b> {payload['client_name']}", meta_style),
+        Paragraph(f"<b>Progetto:</b> {payload['project_name']}", meta_style),
+        Paragraph(f"<b>Generato il:</b> {datetime.now().strftime('%d/%m/%Y %H:%M')}", meta_style),
+        Spacer(1, 8),
+    ]
+
+    table_data = [["Ordine", "Tipo", "ID CR", "Creata da", "Stato", "Descrizione", "Note", "Aggiornata il"]]
+    for row in rows:
+        table_data.append(
+            [
+                row["release_order"],
+                row["cr_type"],
+                row["cr_key"],
+                row["created_by"],
+                row["status"],
+                row["description"],
+                row["notes"],
+                row["updated_at"],
+            ]
+        )
+
+    if len(table_data) == 1:
+        table_data.append(["-", "-", "Nessuna CR", "-", "-", "-", "-", "-"])
+
+    table = Table(
+        table_data,
+        repeatRows=1,
+        colWidths=[16 * mm, 25 * mm, 26 * mm, 30 * mm, 24 * mm, 62 * mm, 62 * mm, 30 * mm],
+    )
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f766e")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+                ("ALIGN", (0, 0), (0, -1), "CENTER"),
+                ("ALIGN", (0, 0), (4, -1), "LEFT"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#f7fbfa"), colors.HexColor("#eef7f5")]),
+                ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#9ca3af")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 4),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+
+    story.append(table)
+    document.build(story)
+    output.seek(0)
+    return output
+
+
 def build_view_model(
     search_text: str = "",
     status_filter: str = "all",
     client_filter: str = "all",
     project_filter: str = "all",
+    type_filter: str = "all",
 ) -> dict:
     data = load_data()
     normalized_search = sanitize_text(search_text).lower()
     normalized_status = sanitize_text(status_filter).lower() or "all"
     normalized_client = normalize_filter_value(client_filter) or "all"
     normalized_project = normalize_filter_value(project_filter) or "all"
+    normalized_type = normalize_filter_value(type_filter) or "all"
     if normalized_status != "all" and normalized_status not in STATUS_META:
         normalized_status = "all"
+    if normalized_type != "all" and normalized_type not in CR_TYPE_META:
+        normalized_type = "all"
 
     visible_clients: list[dict] = []
     global_crs: list[dict] = []
@@ -367,22 +623,22 @@ def build_view_model(
                 continue
 
             decorated_crs = []
-            sorted_crs = sorted(
-                project.get("crs", []),
-                key=lambda item: (item.get("updated_at", ""), item.get("cr_key", "")),
-                reverse=True,
-            )
+            sorted_crs = sort_crs_for_execution(project.get("crs", []))
             total_crs += len(sorted_crs)
 
             for cr in sorted_crs:
-                if not matches_filters(cr, normalized_search, normalized_status):
+                if not matches_filters(cr, normalized_search, normalized_status, normalized_type):
                     continue
 
                 status = normalize_status(cr.get("status"))
+                cr_type = normalize_cr_type(cr.get("cr_type"))
                 meta = STATUS_META[status]
                 decorated_cr = deepcopy(cr)
                 decorated_cr["status_label"] = meta["label"]
                 decorated_cr["tone"] = meta["tone"]
+                decorated_cr["cr_type"] = cr_type
+                decorated_cr["cr_type_label"] = CR_TYPE_META[cr_type]["label"]
+                decorated_cr["release_order"] = normalize_release_order(cr.get("release_order"))
                 decorated_cr["client_name"] = client_name
                 decorated_cr["project_name"] = project_name
                 decorated_cr["client_id"] = client["id"]
@@ -411,6 +667,7 @@ def build_view_model(
                     "crs": decorated_crs,
                     "kanban_columns": kanban_columns,
                     "cr_count": len(project.get("crs", [])),
+                    "next_release_order": next_release_order(project),
                 }
             )
 
@@ -442,9 +699,11 @@ def build_view_model(
             "status_filter": normalized_status,
             "client_filter": normalized_client,
             "project_filter": normalized_project,
+            "type_filter": normalized_type,
         },
         "filter_options": filter_options,
         "status_meta": STATUS_META,
+        "cr_type_meta": CR_TYPE_META,
         "global_kanban_columns": build_global_kanban_columns(global_crs),
         "generated_at": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
@@ -457,6 +716,7 @@ def index():
         status_filter=request.args.get("status", "all"),
         client_filter=request.args.get("client", "all"),
         project_filter=request.args.get("project", "all"),
+        type_filter=request.args.get("type", "all"),
     )
     return render_template("index.html", **view_model)
 
@@ -467,11 +727,13 @@ def export_excel():
     status_filter = request.args.get("status", "all")
     client_filter = request.args.get("client", "all")
     project_filter = request.args.get("project", "all")
+    type_filter = request.args.get("type", "all")
     workbook_stream = build_excel_workbook(
         search_text=search_text,
         status_filter=status_filter,
         client_filter=client_filter,
         project_filter=project_filter,
+        type_filter=type_filter,
     )
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     return send_file(
@@ -479,6 +741,44 @@ def export_excel():
         as_attachment=True,
         download_name=f"sap_cr_list_{timestamp}.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@app.get("/clients/<client_id>/projects/<project_id>/export/excel")
+def export_project_excel(client_id: str, project_id: str):
+    try:
+        workbook_stream = build_project_excel_workbook(client_id, project_id)
+        payload = build_project_export_rows(client_id, project_id)
+    except ValueError as error:
+        flash(str(error), "error")
+        return redirect(url_for("index"))
+
+    safe_project_name = payload["project_name"].replace(" ", "_") or "progetto"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(
+        workbook_stream,
+        as_attachment=True,
+        download_name=f"sap_cr_{safe_project_name}_{timestamp}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@app.get("/clients/<client_id>/projects/<project_id>/export/pdf")
+def export_project_pdf(client_id: str, project_id: str):
+    try:
+        pdf_stream = build_project_pdf_document(client_id, project_id)
+        payload = build_project_export_rows(client_id, project_id)
+    except ValueError as error:
+        flash(str(error), "error")
+        return redirect(url_for("index"))
+
+    safe_project_name = payload["project_name"].replace(" ", "_") or "progetto"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(
+        pdf_stream,
+        as_attachment=True,
+        download_name=f"sap_cr_{safe_project_name}_{timestamp}.pdf",
+        mimetype="application/pdf",
     )
 
 
@@ -606,6 +906,8 @@ def add_cr(client_id: str, project_id: str):
     created_by = sanitize_text(request.form.get("created_by"))
     description = sanitize_text(request.form.get("description"))
     notes = sanitize_text(request.form.get("notes"))
+    cr_type = normalize_cr_type(request.form.get("cr_type"))
+    release_order = normalize_release_order(request.form.get("release_order"), fallback=0)
 
     if not cr_key or not created_by or not description:
         flash("Compila ID CR, utente creatore e descrizione.", "error")
@@ -626,6 +928,13 @@ def add_cr(client_id: str, project_id: str):
         flash("Esiste gia una CR con questo ID nel progetto selezionato.", "error")
         return redirect(url_for("index"))
 
+    if release_order < 1:
+        release_order = next_release_order(project)
+
+    if has_release_order_conflict(project, release_order):
+        flash("Ordine CR gia usato nel progetto. Scegli un ordine diverso.", "error")
+        return redirect(url_for("index"))
+
     timestamp = now_iso()
     project["crs"].append(
         {
@@ -635,6 +944,8 @@ def add_cr(client_id: str, project_id: str):
             "description": description,
             "notes": notes,
             "status": "development",
+            "cr_type": cr_type,
+            "release_order": release_order,
             "created_at": timestamp,
             "updated_at": timestamp,
         }
@@ -667,6 +978,8 @@ def update_cr(client_id: str, project_id: str, cr_id: str):
     description = sanitize_text(request.form.get("description"))
     notes = sanitize_text(request.form.get("notes"))
     status = normalize_status(request.form.get("status"))
+    cr_type = normalize_cr_type(request.form.get("cr_type"))
+    release_order = normalize_release_order(request.form.get("release_order"), fallback=0)
 
     if not cr_key or not created_by or not description:
         flash("ID CR, utente creatore e descrizione sono obbligatori.", "error")
@@ -676,11 +989,21 @@ def update_cr(client_id: str, project_id: str, cr_id: str):
         flash("Nel progetto esiste gia un'altra CR con questo ID.", "error")
         return redirect(url_for("index"))
 
+    if release_order < 1:
+        flash("Ordine CR non valido. Inserisci un numero maggiore di zero.", "error")
+        return redirect(url_for("index"))
+
+    if has_release_order_conflict(project, release_order, exclude_cr_id=cr_id):
+        flash("Ordine CR gia usato nel progetto. Scegli un ordine diverso.", "error")
+        return redirect(url_for("index"))
+
     cr["cr_key"] = cr_key
     cr["created_by"] = created_by
     cr["description"] = description
     cr["notes"] = notes
     cr["status"] = status
+    cr["cr_type"] = cr_type
+    cr["release_order"] = release_order
     cr["updated_at"] = now_iso()
     save_data(data)
     flash("CR aggiornata.", "success")

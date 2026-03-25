@@ -242,6 +242,7 @@
         .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
         .btn-danger { background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca; }
         .btn-export { background: #e8f3ff; color: #184b8a; border: 1px solid #bdd8ff; }
+        .btn-pdf { background: #fff3e8; color: #9a3412; border: 1px solid #fed7aa; }
 
         .flash-list {
             display: grid;
@@ -345,6 +346,12 @@
             padding: 16px;
         }
 
+        .project-card {
+            border: 2px solid #cfe6e1;
+            border-left: 8px solid #0f766e;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fcfb 100%);
+        }
+
         .client-head,
         .project-head,
         .cr-head,
@@ -357,6 +364,36 @@
             flex-wrap: wrap;
         }
 
+        .project-head {
+            border: 1px solid #cde6e1;
+            border-radius: 12px;
+            padding: 10px 12px;
+            background: #eef7f5;
+            margin-bottom: 8px;
+        }
+
+        .project-tools {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #0f4f49;
+            border: 1px solid #b8ddd5;
+            background: #e5f4f1;
+            width: fit-content;
+        }
+
         .client-title,
         .project-title {
             display: grid;
@@ -366,6 +403,15 @@
         .client-title h2,
         .project-title h3 {
             margin: 0;
+        }
+
+        .project-title h3 {
+            font-size: 1.14rem;
+        }
+
+        .project-subtitle {
+            font-size: 0.82rem;
+            color: var(--muted);
         }
 
         .meta-row {
@@ -501,8 +547,72 @@
             border-top: 1px solid var(--line);
         }
 
+        .project-cr-section-title {
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 700;
+        }
+
+        .project-toggle {
+            border: 1px solid #b8ddd5;
+            background: #e5f4f1;
+            color: #0f4f49;
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .project-toggle:hover {
+            background: #d8efe9;
+        }
+
+        .project-card.is-collapsed .project-content {
+            display: none;
+        }
+
+        .project-card.is-collapsed {
+            padding-bottom: 12px;
+        }
+
         .global-board-card {
             margin-bottom: 16px;
+        }
+
+        .client-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .client-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            padding: 8px 12px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        .client-tab:hover {
+            border-color: rgba(15, 118, 110, 0.35);
+            background: #f3fbf9;
+        }
+
+        .client-tab.active {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: #fff;
         }
 
         .global-card-meta {
@@ -668,10 +778,17 @@
                                 <option value="production" {% if filters.status_filter == 'production' %}selected{% endif %}>Produzione</option>
                             </select>
                         </label>
+                        <label>
+                            Tipo CR
+                            <select name="type">
+                                <option value="all" {% if filters.type_filter == 'all' %}selected{% endif %}>Tutti i tipi</option>
+                                <option value="workbench" {% if filters.type_filter == 'workbench' %}selected{% endif %}>Workbench</option>
+                                <option value="customizing" {% if filters.type_filter == 'customizing' %}selected{% endif %}>Customizing</option>
+                            </select>
+                        </label>
                         <div class="form-actions">
                             <button class="btn btn-brand" type="submit">Applica filtri</button>
                             <a class="btn btn-light" href="{{ url_for('index') }}">Reset</a>
-                            <a class="btn btn-export" href="{{ url_for('export_excel', q=filters.search_text, status=filters.status_filter, client=filters.client_filter, project=filters.project_filter) }}">Export Excel</a>
                         </div>
                     </form>
                 </section>
@@ -688,6 +805,17 @@
             </div>
 
             <section>
+                <section class="card" style="margin-bottom: 16px;">
+                    <h2>Clienti</h2>
+                    <p>Seleziona il cliente su cui vuoi lavorare. Ogni tab mostra solo i progetti e le CR del cliente selezionato.</p>
+                    <div class="client-tabs">
+                        <a class="client-tab {% if filters.client_filter == 'all' %}active{% endif %}" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client='all', project='all', type=filters.type_filter) }}">Tutti i clienti</a>
+                        {% for client_name in filter_options.clients %}
+                        <a class="client-tab {% if filters.client_filter == client_name.lower() %}active{% endif %}" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client=client_name, project='all', type=filters.type_filter) }}">{{ client_name }}</a>
+                        {% endfor %}
+                    </div>
+                </section>
+
                 <section class="card global-board-card">
                     <h2>Board globale</h2>
                     <p>Vista Kanban trasversale su tutte le CR visibili con i filtri correnti. Ogni card mostra cliente e progetto di appartenenza.</p>
@@ -710,6 +838,8 @@
                                                 <div class="cr-meta">
                                                     <span>{{ cr.client_name }}</span>
                                                     <span>{{ cr.project_name }}</span>
+                                                    <span>Ordine {{ cr.release_order }}</span>
+                                                    <span>{{ cr.cr_type_label }}</span>
                                                     <span>Creata da {{ cr.created_by }}</span>
                                                 </div>
                                             </div>
@@ -767,22 +897,45 @@
                             <article id="project-{{ client.id }}-{{ project.id }}" class="project-card">
                                 <div class="project-head">
                                     <div class="project-title">
+                                        <span class="project-chip">Progetto</span>
                                         <h3>{{ project.name }}</h3>
+                                        <span class="project-subtitle">Area operativa per questo progetto</span>
                                         <div class="meta-row">
                                             <span class="pill pill-development">{{ project.cr_count }} CR nel progetto</span>
                                         </div>
                                     </div>
-                                    <form method="post" action="{{ url_for('delete_project', client_id=client.id, project_id=project.id) }}" onsubmit="return confirm('Eliminare il progetto e tutte le CR associate?');">
-                                        <button class="btn btn-light" type="submit">Elimina progetto</button>
-                                    </form>
+                                    <div class="project-tools">
+                                        <button class="project-toggle" type="button" data-project-toggle="project-{{ client.id }}-{{ project.id }}" aria-expanded="true">Comprimi</button>
+                                        <a class="btn btn-export" href="{{ url_for('export_project_excel', client_id=client.id, project_id=project.id) }}">Export Excel</a>
+                                        <a class="btn btn-pdf" href="{{ url_for('export_project_pdf', client_id=client.id, project_id=project.id) }}">Export PDF</a>
+                                        <form method="post" action="{{ url_for('delete_project', client_id=client.id, project_id=project.id) }}" onsubmit="return confirm('Eliminare il progetto e tutte le CR associate?');">
+                                            <button class="btn btn-light" type="submit">Elimina progetto</button>
+                                        </form>
+                                    </div>
                                 </div>
 
+                                <div class="project-content">
+
                                 <form method="post" action="{{ url_for('add_cr', client_id=client.id, project_id=project.id) }}" class="compact-form">
+                                    <p class="project-cr-section-title">Nuova CR per il progetto {{ project.name }}</p>
                                     <div class="fields-3">
+                                        <label>
+                                            Ordine rilascio
+                                            <input type="number" min="1" name="release_order" value="{{ project.next_release_order }}" required>
+                                        </label>
+                                        <label>
+                                            Tipo CR
+                                            <select name="cr_type">
+                                                <option value="workbench">Workbench</option>
+                                                <option value="customizing">Customizing</option>
+                                            </select>
+                                        </label>
                                         <label>
                                             ID CR
                                             <input type="text" name="cr_key" placeholder="Nuova CR" required>
                                         </label>
+                                    </div>
+                                    <div class="fields-3">
                                         <label>
                                             Creata da
                                             <input type="text" name="created_by" placeholder="Creato da" required>
@@ -821,6 +974,8 @@
                                                         <div>
                                                             <strong>{{ cr.cr_key }}</strong>
                                                             <div class="cr-meta">
+                                                                <span>Ordine {{ cr.release_order }}</span>
+                                                                <span>{{ cr.cr_type_label }}</span>
                                                                 <span>Creata da {{ cr.created_by }}</span>
                                                                 <span>Inserita {{ cr.created_at.replace('T', ' ') }}</span>
                                                                 <span>Aggiornata {{ cr.updated_at.replace('T', ' ') }}</span>
@@ -831,6 +986,17 @@
 
                                                     <form method="post" action="{{ url_for('update_cr', client_id=client.id, project_id=project.id, cr_id=cr.id) }}" class="compact-form">
                                                         <div class="fields-3">
+                                                            <label>
+                                                                Ordine rilascio
+                                                                <input type="number" min="1" name="release_order" value="{{ cr.release_order }}" required>
+                                                            </label>
+                                                            <label>
+                                                                Tipo CR
+                                                                <select name="cr_type">
+                                                                    <option value="workbench" {% if cr.cr_type == 'workbench' %}selected{% endif %}>Workbench</option>
+                                                                    <option value="customizing" {% if cr.cr_type == 'customizing' %}selected{% endif %}>Customizing</option>
+                                                                </select>
+                                                            </label>
                                                             <label>
                                                                 ID CR
                                                                 <input type="text" name="cr_key" value="{{ cr.cr_key }}" required>
@@ -875,6 +1041,7 @@
                                     </section>
                                     {% endfor %}
                                 </div>
+                                </div>
                             </article>
                             {% endfor %}
 
@@ -900,6 +1067,7 @@
             const draggableCards = document.querySelectorAll('.kanban-draggable');
             const dropzones = document.querySelectorAll('.kanban-dropzone');
             const globalCards = document.querySelectorAll('.global-kanban-card');
+            const projectToggles = document.querySelectorAll('[data-project-toggle]');
             let activeDragPayload = null;
 
             const clearDropTargets = () => {
@@ -933,6 +1101,19 @@
                 }, 1800);
             };
 
+            const setProjectCollapsed = (projectCard, collapsed) => {
+                if (!projectCard) {
+                    return;
+                }
+
+                projectCard.classList.toggle('is-collapsed', collapsed);
+                const toggle = document.querySelector(`[data-project-toggle="${projectCard.id}"]`);
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                    toggle.textContent = collapsed ? 'Espandi' : 'Comprimi';
+                }
+            };
+
             const highlightDetailCard = (targetId) => {
                 const target = document.getElementById(targetId);
                 if (!target) {
@@ -956,6 +1137,7 @@
                 }
 
                 if (projectCard) {
+                    setProjectCollapsed(projectCard, false);
                     projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     flashElement(projectCard);
                 }
@@ -1017,6 +1199,19 @@
                     }
                     openClientAndProject(card.dataset.clientTarget, card.dataset.projectTarget);
                     highlightDetailCard(card.dataset.detailTarget);
+                });
+            });
+
+            projectToggles.forEach((toggle) => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.dataset.projectToggle;
+                    const projectCard = document.getElementById(targetId);
+                    if (!projectCard) {
+                        return;
+                    }
+
+                    const isCollapsed = projectCard.classList.contains('is-collapsed');
+                    setProjectCollapsed(projectCard, !isCollapsed);
                 });
             });
 

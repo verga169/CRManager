@@ -6,13 +6,16 @@ Applicazione Flask locale per gestire Change Request SAP organizzate per cliente
 
 - Persistenza locale su `data_store.json`
 - Struttura gerarchica `Cliente -> Progetto -> CR`
-- Campi CR: ID CR, utente creatore, descrizione, note operative, stato trasporto
+- Campi CR: ordine rilascio, tipo (`Workbench`/`Customizing`), ID CR, utente creatore, descrizione, note operative, stato trasporto
 - Stati colore:
   - `Sviluppo` -> verde
   - `Quality` -> viola
   - `Produzione` -> rosso
-- Dashboard con contatori e filtri per stato o testo libero
-- Export Excel della lista CR, anche con filtri correnti applicati
+- Ordinamento CR per sequenza di rilascio (ordine crescente), con ordine univoco all'interno del progetto
+- Dashboard con contatori e filtri per stato, tipo CR o testo libero
+- Export per singolo progetto direttamente dalla card progetto:
+  - Excel (.xlsx)
+  - PDF (.pdf) con layout tabellare formattato
 
 ## Avvio locale
 
