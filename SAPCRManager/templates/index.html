@@ -613,6 +613,30 @@
         .cr-summary-side .pill {
             padding: 5px 9px;
             font-size: 0.76rem;
+
+                .type-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    border-radius: 4px;
+                    padding: 3px 7px;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    letter-spacing: 0.02em;
+                    border: 1px solid transparent;
+                    flex-shrink: 0;
+                }
+
+                .type-tag-workbench {
+                    background: var(--brand-soft);
+                    color: var(--brand);
+                    border-color: #b3d4f5;
+                }
+
+                .type-tag-customizing {
+                    background: var(--development-soft);
+                    color: var(--development);
+                    border-color: #b7dec2;
+                }
         }
 
         .cr-expand-hint {
@@ -1019,6 +1043,7 @@
                                                 </div>
                                             </div>
                                             <div class="cr-summary-side">
+                                                <span class="type-tag type-tag-{{ cr.cr_type }}">{{ cr.cr_type_label }}</span>
                                                 <span class="pill pill-{{ cr.tone }}">{{ cr.status_label }}</span>
                                                 <span class="cr-expand-hint" aria-hidden="true"></span>
                                             </div>
@@ -1028,7 +1053,6 @@
                                                 <span>{{ cr.client_name }}</span>
                                                 <span>{{ cr.project_name }}</span>
                                                 <span>Ordine {{ cr.release_order }}</span>
-                                                <span>{{ cr.cr_type_label }}</span>
                                                 <span>Creata da {{ cr.created_by }}</span>
                                             </div>
                                             {% if cr.notes %}
