@@ -978,6 +978,87 @@ def add_cr(client_id: str, project_id: str):
     return redirect(url_for("index"))
 
 
+@app.post("/api/clients/<client_id>/projects/<project_id>/crs/clipboard-import")
+def import_crs_from_clipboard(client_id: str, project_id: str):
+    payload = request.get_json(silent=True) or {}
+    raw_entries = payload.get("entries")
+
+    if not isinstance(raw_entries, list) or not raw_entries:
+        return jsonify({"ok": False, "message": "Nessuna CR valida da importare."}), 400
+
+    data = load_data()
+    client = find_client(data, client_id)
+    if client is None:
+        return jsonify({"ok": False, "message": "Cliente non trovato."}), 404
+
+    project = find_project(client, project_id)
+    if project is None:
+        return jsonify({"ok": False, "message": "Progetto non trovato."}), 404
+
+    existing_keys = {sanitize_text(item.get("cr_key", "")).lower() for item in project.get("crs", [])}
+    import_keys = set()
+    normalized_entries = []
+
+    for index, raw_entry in enumerate(raw_entries, start=1):
+        if not isinstance(raw_entry, dict):
+            return jsonify({"ok": False, "message": f"Riga {index}: formato non valido."}), 400
+
+        cr_key = sanitize_text(raw_entry.get("cr_key"))
+        created_by = sanitize_text(raw_entry.get("created_by"))
+        description = sanitize_text(raw_entry.get("description"))
+        cr_type = normalize_cr_type(raw_entry.get("cr_type"))
+
+        if not cr_key or not created_by or not description:
+            return jsonify({"ok": False, "message": f"Riga {index}: compila Richiesta, creatore e descrizione."}), 400
+
+        lowered_key = cr_key.lower()
+        if lowered_key in existing_keys:
+            return jsonify({"ok": False, "message": f"Riga {index}: la richiesta {cr_key} esiste gia nel progetto."}), 400
+
+        if lowered_key in import_keys:
+            return jsonify({"ok": False, "message": f"Riga {index}: richiesta duplicata nel blocco incollato ({cr_key})."}), 400
+
+        import_keys.add(lowered_key)
+        normalized_entries.append(
+            {
+                "cr_key": cr_key,
+                "created_by": created_by,
+                "description": description,
+                "cr_type": cr_type,
+            }
+        )
+
+    start_release_order = next_release_order(project)
+    timestamp = now_iso()
+
+    total_entries = len(normalized_entries)
+    for offset, entry in enumerate(normalized_entries):
+        release_order = start_release_order + (total_entries - 1 - offset)
+        project.setdefault("crs", []).append(
+            {
+                "id": new_id(),
+                "cr_key": entry["cr_key"],
+                "created_by": entry["created_by"],
+                "description": entry["description"],
+                "notes": "",
+                "status": "development",
+                "cr_type": entry["cr_type"],
+                "release_order": release_order,
+                "created_at": timestamp,
+                "updated_at": timestamp,
+            }
+        )
+
+    save_data(data)
+    return jsonify(
+        {
+            "ok": True,
+            "imported": len(normalized_entries),
+            "start_release_order": start_release_order,
+        }
+    )
+
+
 @app.post("/clients/<client_id>/projects/<project_id>/crs/<cr_id>/update")
 def update_cr(client_id: str, project_id: str, cr_id: str):
     data = load_data()

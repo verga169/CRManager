@@ -884,6 +884,83 @@
             background: #ffffff;
         }
 
+        .dialog-wide {
+            width: min(980px, calc(100vw - 24px));
+        }
+
+        .clipboard-input {
+            min-height: 130px;
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .clipboard-inline-actions {
+            margin-top: 10px;
+        }
+
+        .clipboard-preview-controls {
+            margin-top: 14px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .clipboard-preview-controls label {
+            display: grid;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .clipboard-preview-wrap {
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 320px;
+            background: #fff;
+        }
+
+        .clipboard-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+        }
+
+        .clipboard-preview-table th,
+        .clipboard-preview-table td {
+            border-bottom: 1px solid #e5edf4;
+            padding: 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .clipboard-type-select {
+            min-width: 150px;
+            margin: 0;
+        }
+
+        .clipboard-preview-table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #f6f9fc;
+            color: var(--muted);
+            font-size: 0.76rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .clipboard-preview-empty,
+        .clipboard-preview-error {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .clipboard-preview-error {
+            color: #b91c1c;
+        }
+
         .dialog-head {
             display: grid;
             gap: 8px;
@@ -1163,6 +1240,17 @@
                                         </label>
                                     </div>
                                     <div class="form-actions">
+                                        <button
+                                            class="btn btn-light"
+                                            type="button"
+                                            data-open-clipboard-import
+                                            data-client-id="{{ client.id }}"
+                                            data-project-id="{{ project.id }}"
+                                            data-project-name="{{ project.name }}"
+                                            data-next-release-order="{{ project.next_release_order }}"
+                                        >
+                                            Incolla da clipboard
+                                        </button>
                                         <button class="btn btn-brand" type="submit">Aggiungi CR</button>
                                     </div>
                                 </form>
@@ -1301,6 +1389,62 @@
                 </form>
             </div>
         </dialog>
+
+        <dialog id="clipboard-import-dialog" class="dialog dialog-wide">
+            <div class="dialog-shell">
+                <div class="dialog-head">
+                    <h2>Import CR da clipboard</h2>
+                    <p id="clipboard-import-target">Incolla una o piu righe copiate da SAP, poi conferma l'inserimento.</p>
+                </div>
+
+                <div class="fields-1">
+                    <label>
+                        Contenuto clipboard
+                        <textarea id="clipboard-import-text" class="clipboard-input" placeholder="Incolla qui le righe copiate da SAP"></textarea>
+                    </label>
+                </div>
+
+                <div class="form-actions clipboard-inline-actions">
+                    <button class="btn btn-light" type="button" id="clipboard-read-button">Leggi da clipboard</button>
+                    <button class="btn btn-light" type="button" id="clipboard-parse-button">Analizza testo</button>
+                </div>
+
+                <p id="clipboard-preview-error" class="clipboard-preview-error" hidden></p>
+
+                <div class="clipboard-preview-controls">
+                    <label>
+                        Applica tipo a tutte
+                        <select id="clipboard-apply-type">
+                            <option value="workbench">Workbench</option>
+                            <option value="customizing">Customizing</option>
+                        </select>
+                    </label>
+                    <button class="btn btn-light" type="button" id="clipboard-apply-type-button">Applica</button>
+                </div>
+
+                <div class="clipboard-preview-wrap">
+                    <table class="clipboard-preview-table">
+                        <thead>
+                            <tr>
+                                <th>Ordine</th>
+                                <th>Richiesta</th>
+                                <th>Creatore</th>
+                                <th>Descrizione</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clipboard-preview-rows"></tbody>
+                    </table>
+                </div>
+
+                <p id="clipboard-preview-empty" class="clipboard-preview-empty">Nessuna CR da importare. Incolla il testo e premi "Analizza testo".</p>
+
+                <div class="form-actions">
+                    <button class="btn btn-brand" type="button" id="clipboard-import-confirm" disabled>Conferma inserimento</button>
+                    <button class="btn btn-light" type="button" id="clipboard-import-cancel">Annulla</button>
+                </div>
+            </div>
+        </dialog>
     </main>
     <script>
         (() => {
@@ -1320,7 +1464,24 @@
             const projectDialogTitle = document.getElementById('project-dialog-title');
             const projectDialogDescription = document.getElementById('project-dialog-description');
             const projectNameInput = document.getElementById('project-name-input');
+            const openClipboardImportButtons = document.querySelectorAll('[data-open-clipboard-import]');
+            const clipboardImportDialog = document.getElementById('clipboard-import-dialog');
+            const clipboardImportTarget = document.getElementById('clipboard-import-target');
+            const clipboardImportText = document.getElementById('clipboard-import-text');
+            const clipboardReadButton = document.getElementById('clipboard-read-button');
+            const clipboardParseButton = document.getElementById('clipboard-parse-button');
+            const clipboardApplyType = document.getElementById('clipboard-apply-type');
+            const clipboardApplyTypeButton = document.getElementById('clipboard-apply-type-button');
+            const clipboardPreviewRows = document.getElementById('clipboard-preview-rows');
+            const clipboardPreviewEmpty = document.getElementById('clipboard-preview-empty');
+            const clipboardPreviewError = document.getElementById('clipboard-preview-error');
+            const clipboardImportConfirm = document.getElementById('clipboard-import-confirm');
+            const clipboardImportCancel = document.getElementById('clipboard-import-cancel');
+            const postForms = document.querySelectorAll('form[method="post"], form[method="POST"]');
+            const AUTO_RESTORE_KEY = 'sap-cr-auto-restore';
             let activeDragPayload = null;
+            let clipboardContext = null;
+            let clipboardEntries = [];
 
             const clearDropTargets = () => {
                 dropzones.forEach((zone) => {
@@ -1376,6 +1537,241 @@
                 crCard.classList.toggle('is-expanded', expanded);
             };
 
+            const setClipboardError = (message = '') => {
+                if (!clipboardPreviewError) {
+                    return;
+                }
+
+                clipboardPreviewError.textContent = message;
+                clipboardPreviewError.hidden = !message;
+            };
+
+            const renderClipboardPreview = () => {
+                if (!clipboardPreviewRows || !clipboardPreviewEmpty || !clipboardImportConfirm || !clipboardContext) {
+                    return;
+                }
+
+                clipboardPreviewRows.innerHTML = '';
+                if (!clipboardEntries.length) {
+                    clipboardPreviewEmpty.hidden = false;
+                    clipboardImportConfirm.disabled = true;
+                    return;
+                }
+
+                clipboardPreviewEmpty.hidden = true;
+                clipboardImportConfirm.disabled = false;
+
+                clipboardEntries.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+
+                    const orderCell = document.createElement('td');
+                    const totalEntries = clipboardEntries.length;
+                    orderCell.textContent = String(clipboardContext.nextReleaseOrder + (totalEntries - 1 - index));
+
+                    const keyCell = document.createElement('td');
+                    keyCell.textContent = entry.cr_key;
+
+                    const creatorCell = document.createElement('td');
+                    creatorCell.textContent = entry.created_by;
+
+                    const descriptionCell = document.createElement('td');
+                    descriptionCell.textContent = entry.description;
+
+                    const typeCell = document.createElement('td');
+                    const typeSelect = document.createElement('select');
+                    typeSelect.className = 'clipboard-type-select';
+                    const workbenchOption = document.createElement('option');
+                    workbenchOption.value = 'workbench';
+                    workbenchOption.textContent = 'Workbench';
+                    const customizingOption = document.createElement('option');
+                    customizingOption.value = 'customizing';
+                    customizingOption.textContent = 'Customizing';
+                    typeSelect.appendChild(workbenchOption);
+                    typeSelect.appendChild(customizingOption);
+                    typeSelect.value = entry.cr_type || 'workbench';
+                    typeCell.appendChild(typeSelect);
+
+                    row.appendChild(orderCell);
+                    row.appendChild(keyCell);
+                    row.appendChild(creatorCell);
+                    row.appendChild(descriptionCell);
+                    row.appendChild(typeCell);
+                    clipboardPreviewRows.appendChild(row);
+                });
+            };
+
+            const parseClipboardContent = () => {
+                const rawText = (clipboardImportText?.value || '').replace(/\r/g, '\n');
+                const lines = rawText
+                    .split('\n')
+                    .map((line) => line.trim())
+                    .filter(Boolean);
+
+                if (!lines.length) {
+                    clipboardEntries = [];
+                    setClipboardError('Incolla almeno una riga valida da SAP.');
+                    renderClipboardPreview();
+                    return;
+                }
+
+                const invalidRows = [];
+                const parsedEntries = [];
+                lines.forEach((line, index) => {
+                    const match = line.match(/^(\S+)\s+(\S+)\s+(.+)$/);
+                    if (!match) {
+                        invalidRows.push(index + 1);
+                        return;
+                    }
+
+                    parsedEntries.push(
+                        {
+                            cr_key: match[1].trim(),
+                            created_by: match[2].trim(),
+                            description: match[3].trim(),
+                            cr_type: 'workbench',
+                        }
+                    );
+                });
+
+                if (invalidRows.length) {
+                    clipboardEntries = [];
+                    setClipboardError(`Formato non valido nelle righe: ${invalidRows.join(', ')}.`);
+                    renderClipboardPreview();
+                    return;
+                }
+
+                const seenKeys = new Set();
+                const duplicateKey = parsedEntries.find((entry) => {
+                    const lowered = entry.cr_key.toLowerCase();
+                    if (seenKeys.has(lowered)) {
+                        return true;
+                    }
+                    seenKeys.add(lowered);
+                    return false;
+                });
+
+                if (duplicateKey) {
+                    clipboardEntries = [];
+                    setClipboardError(`Richiesta duplicata nel testo incollato: ${duplicateKey.cr_key}.`);
+                    renderClipboardPreview();
+                    return;
+                }
+
+                clipboardEntries = parsedEntries;
+                setClipboardError('');
+                renderClipboardPreview();
+            };
+
+            const resetClipboardDialog = () => {
+                clipboardEntries = [];
+                clipboardContext = null;
+                if (clipboardImportText) {
+                    clipboardImportText.value = '';
+                }
+                if (clipboardImportTarget) {
+                    clipboardImportTarget.textContent = 'Incolla una o piu righe copiate da SAP, poi conferma l\'inserimento.';
+                }
+                setClipboardError('');
+                if (clipboardPreviewRows) {
+                    clipboardPreviewRows.innerHTML = '';
+                }
+                if (clipboardPreviewEmpty) {
+                    clipboardPreviewEmpty.hidden = false;
+                }
+                if (clipboardImportConfirm) {
+                    clipboardImportConfirm.disabled = true;
+                }
+            };
+
+            const saveAutoRestoreState = (reason) => {
+                const payload = {
+                    reason,
+                    savedAt: Date.now(),
+                    scrollY: window.scrollY || 0,
+                    openClientIds: Array.from(document.querySelectorAll('.client-card[open]')).map((item) => item.id).filter(Boolean),
+                    expandedProjectIds: Array.from(document.querySelectorAll('.project-card:not(.is-collapsed)')).map((item) => item.id).filter(Boolean),
+                    expandedCrKeys: Array.from(document.querySelectorAll('.cr-expandable.is-expanded'))
+                        .map((item) => item.id || item.dataset.detailTarget || '')
+                        .filter(Boolean),
+                };
+
+                sessionStorage.setItem(AUTO_RESTORE_KEY, JSON.stringify(payload));
+            };
+
+            const readAutoRestoreState = () => {
+                const raw = sessionStorage.getItem(AUTO_RESTORE_KEY);
+                if (!raw) {
+                    return null;
+                }
+
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || typeof parsed !== 'object') {
+                        return null;
+                    }
+                    return parsed;
+                } catch (_error) {
+                    return null;
+                }
+            };
+
+            const clearAutoRestoreState = () => {
+                sessionStorage.removeItem(AUTO_RESTORE_KEY);
+            };
+
+            const applyHomeView = () => {
+                document.querySelectorAll('.project-card').forEach((projectCard) => {
+                    setProjectCollapsed(projectCard, true);
+                });
+                document.querySelectorAll('.cr-expandable').forEach((crCard) => {
+                    setCrExpanded(crCard, false);
+                });
+                window.scrollTo({ top: 0, behavior: 'auto' });
+            };
+
+            const applyRestoreView = (state) => {
+                const openClientIds = new Set(Array.isArray(state.openClientIds) ? state.openClientIds : []);
+                const expandedProjectIds = new Set(Array.isArray(state.expandedProjectIds) ? state.expandedProjectIds : []);
+                const expandedCrKeys = new Set(Array.isArray(state.expandedCrKeys) ? state.expandedCrKeys : []);
+
+                document.querySelectorAll('.client-card').forEach((clientCard) => {
+                    if (!clientCard.id) {
+                        return;
+                    }
+                    clientCard.open = openClientIds.has(clientCard.id);
+                });
+
+                document.querySelectorAll('.project-card').forEach((projectCard) => {
+                    const expanded = projectCard.id && expandedProjectIds.has(projectCard.id);
+                    setProjectCollapsed(projectCard, !expanded);
+                });
+
+                document.querySelectorAll('.cr-expandable').forEach((crCard) => {
+                    const key = crCard.id || crCard.dataset.detailTarget || '';
+                    setCrExpanded(crCard, expandedCrKeys.has(key));
+                });
+
+                const top = Number.isFinite(state.scrollY) ? state.scrollY : 0;
+                window.requestAnimationFrame(() => {
+                    window.scrollTo({ top, behavior: 'auto' });
+                });
+            };
+
+            const navigationEntry = performance.getEntriesByType('navigation')[0];
+            const navigationType = navigationEntry ? navigationEntry.type : 'navigate';
+            const savedViewState = readAutoRestoreState();
+            const hasFreshRestoreState = savedViewState && (Date.now() - Number(savedViewState.savedAt || 0) < 120000);
+
+            if (hasFreshRestoreState) {
+                applyRestoreView(savedViewState);
+                clearAutoRestoreState();
+            } else {
+                clearAutoRestoreState();
+                if (navigationType === 'reload') {
+                    applyHomeView();
+                }
+            }
+
             const highlightDetailCard = (targetId) => {
                 const target = document.getElementById(targetId);
                 if (!target) {
@@ -1429,11 +1825,18 @@
                         throw new Error(payload.message || 'Aggiornamento stato non riuscito.');
                     }
 
+                    saveAutoRestoreState('status-refresh');
                     window.location.reload();
                 } catch (error) {
                     alert(error.message || 'Aggiornamento stato non riuscito.');
                 }
             };
+
+            postForms.forEach((form) => {
+                form.addEventListener('submit', () => {
+                    saveAutoRestoreState('form-submit');
+                });
+            });
 
             draggableCards.forEach((card) => {
                 card.addEventListener('dragstart', (event) => {
@@ -1533,6 +1936,132 @@
                     }, 0);
                 });
             });
+
+            openClipboardImportButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (!clipboardImportDialog) {
+                        return;
+                    }
+
+                    clipboardContext = {
+                        clientId: button.dataset.clientId,
+                        projectId: button.dataset.projectId,
+                        projectName: button.dataset.projectName || 'progetto selezionato',
+                        nextReleaseOrder: Number.parseInt(button.dataset.nextReleaseOrder || '1', 10) || 1,
+                    };
+
+                    clipboardEntries = [];
+                    if (clipboardImportText) {
+                        clipboardImportText.value = '';
+                    }
+                    if (clipboardImportTarget) {
+                        clipboardImportTarget.textContent = `Progetto: ${clipboardContext.projectName}. Il sistema proporra l'ordine progressivo a partire da ${clipboardContext.nextReleaseOrder}.`;
+                    }
+                    setClipboardError('');
+                    renderClipboardPreview();
+
+                    clipboardImportDialog.showModal();
+                    window.setTimeout(() => {
+                        clipboardImportText?.focus();
+                    }, 0);
+                });
+            });
+
+            if (clipboardReadButton) {
+                clipboardReadButton.addEventListener('click', async () => {
+                    if (!clipboardImportText) {
+                        return;
+                    }
+
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        clipboardImportText.value = text;
+                        parseClipboardContent();
+                    } catch (_error) {
+                        setClipboardError('Lettura clipboard non disponibile: incolla manualmente nel campo testo.');
+                    }
+                });
+            }
+
+            if (clipboardParseButton) {
+                clipboardParseButton.addEventListener('click', () => {
+                    parseClipboardContent();
+                });
+            }
+
+            if (clipboardApplyTypeButton) {
+                clipboardApplyTypeButton.addEventListener('click', () => {
+                    const selectedType = clipboardApplyType?.value || 'workbench';
+                    document.querySelectorAll('.clipboard-type-select').forEach((select) => {
+                        select.value = selectedType;
+                    });
+                });
+            }
+
+            if (clipboardImportConfirm) {
+                clipboardImportConfirm.addEventListener('click', async () => {
+                    if (!clipboardContext || !clipboardEntries.length) {
+                        return;
+                    }
+
+                    const typeSelects = Array.from(document.querySelectorAll('.clipboard-type-select'));
+                    const entriesPayload = clipboardEntries.map((entry, index) => ({
+                        cr_key: entry.cr_key,
+                        created_by: entry.created_by,
+                        description: entry.description,
+                        cr_type: typeSelects[index]?.value || 'workbench',
+                    }));
+
+                    try {
+                        const response = await fetch(
+                            `/api/clients/${clipboardContext.clientId}/projects/${clipboardContext.projectId}/crs/clipboard-import`,
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ entries: entriesPayload }),
+                            }
+                        );
+
+                        const payload = await response.json();
+                        if (!response.ok || !payload.ok) {
+                            throw new Error(payload.message || 'Import CR non riuscito.');
+                        }
+
+                        clipboardImportDialog?.close();
+                        saveAutoRestoreState('clipboard-import');
+                        window.location.reload();
+                    } catch (error) {
+                        alert(error.message || 'Import CR non riuscito.');
+                    }
+                });
+            }
+
+            if (clipboardImportCancel && clipboardImportDialog) {
+                clipboardImportCancel.addEventListener('click', () => {
+                    clipboardImportDialog.close();
+                });
+            }
+
+            if (clipboardImportDialog) {
+                clipboardImportDialog.addEventListener('close', () => {
+                    resetClipboardDialog();
+                });
+
+                clipboardImportDialog.addEventListener('click', (event) => {
+                    const dialogBounds = clipboardImportDialog.getBoundingClientRect();
+                    const isInDialog =
+                        dialogBounds.top <= event.clientY &&
+                        event.clientY <= dialogBounds.top + dialogBounds.height &&
+                        dialogBounds.left <= event.clientX &&
+                        event.clientX <= dialogBounds.left + dialogBounds.width;
+
+                    if (!isInDialog) {
+                        clipboardImportDialog.close();
+                    }
+                });
+            }
 
             if (cancelProjectDialogButton && projectCreateDialog) {
                 cancelProjectDialogButton.addEventListener('click', () => {
