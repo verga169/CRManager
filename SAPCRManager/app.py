@@ -62,6 +62,19 @@ def sanitize_text(raw_value: str) -> str:
     return (raw_value or "").strip()
 
 
+def build_project_export_filename(project_name: str, extension: str) -> str:
+    normalized_project_name = sanitize_text(project_name).lower()
+    safe_project_name = "".join(
+        character if character.isalnum() else "_"
+        for character in normalized_project_name
+    ).strip("_") or "progetto"
+    while "__" in safe_project_name:
+        safe_project_name = safe_project_name.replace("__", "_")
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"sap_cr_progetto_{safe_project_name}_{timestamp}.{extension}"
+
+
 def new_id() -> str:
     return uuid4().hex[:12]
 
@@ -759,12 +772,10 @@ def export_project_excel(client_id: str, project_id: str):
         flash(str(error), "error")
         return redirect(url_for("index"))
 
-    safe_project_name = payload["project_name"].replace(" ", "_") or "progetto"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     return send_file(
         workbook_stream,
         as_attachment=True,
-        download_name=f"sap_cr_{safe_project_name}_{timestamp}.xlsx",
+        download_name=build_project_export_filename(payload["project_name"], "xlsx"),
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
@@ -778,12 +789,10 @@ def export_project_pdf(client_id: str, project_id: str):
         flash(str(error), "error")
         return redirect(url_for("index"))
 
-    safe_project_name = payload["project_name"].replace(" ", "_") or "progetto"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     return send_file(
         pdf_stream,
         as_attachment=True,
-        download_name=f"sap_cr_{safe_project_name}_{timestamp}.pdf",
+        download_name=build_project_export_filename(payload["project_name"], "pdf"),
         mimetype="application/pdf",
     )
 
