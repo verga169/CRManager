@@ -1,0 +1,10 @@
+SAPCRManager/data_store.json
+Home13/data_store.json
+Home13/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+*.pyc
+.venv/
+Home13/.venv/
+Home13/.git/

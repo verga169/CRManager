@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>SAP CR Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f3f5f4;
+            --card: #ffffff;
+            --ink: #1f2c28;
+            --muted: #5f6b66;
+            --line: #d8ddd8;
+            --brand: #0f766e;
+            --brand-dark: #0b4f4a;
+            --brand-soft: #d7f2ee;
+            --quality: #7c3aed;
+            --quality-soft: #efe4ff;
+            --production: #dc2626;
+            --production-soft: #ffe1e1;
+            --development: #15803d;
+            --development-soft: #dcfce7;
+            --shadow: 0 12px 30px rgba(20, 36, 31, 0.10);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 8%, rgba(136, 182, 174, 0.22) 0%, transparent 42%),
+                radial-gradient(circle at 88% 16%, rgba(173, 194, 191, 0.16) 0%, transparent 34%),
+                linear-gradient(180deg, #f7f8f7 0%, #edf2f0 52%, #eaf0ee 100%);
+            font-family: "DM Sans", sans-serif;
+        }
+
+        .page {
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+
+        .hero,
+        .metric,
+        .card,
+        .client-card,
+        .project-card,
+        .cr-item,
+        .btn,
+        input,
+        textarea,
+        select,
+        details {
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+        }
+
+        .hero {
+            background: linear-gradient(130deg, #134e4a 0%, #0f766e 55%, #0d9488 100%);
+            border-radius: 24px;
+            color: #f4fffc;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-family: "Syne", sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            letter-spacing: 0.02em;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            max-width: 820px;
+            color: #d7fff7;
+            line-height: 1.55;
+        }
+
+        .hero-meta {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .top-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .metric .label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .metric .value {
+            margin-top: 8px;
+            font-size: 1.45rem;
+            font-weight: 700;
+        }
+
+        .metric small {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+        }
+
+        .metric.status-development .value { color: var(--development); }
+        .metric.status-quality .value { color: var(--quality); }
+        .metric.status-production .value { color: var(--production); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .stack {
+            display: grid;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .card h2,
+        .card h3 {
+            margin: 0 0 12px;
+            font-family: "Syne", sans-serif;
+        }
+
+        .card h2 { font-size: 1.25rem; }
+        .card h3 { font-size: 1.05rem; }
+
+        .card p {
+            margin: 0 0 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .fields-1,
+        .fields-3 {
+            display: grid;
+            gap: 10px;
+        }
+
+        .fields-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 11px 12px;
+            font: inherit;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 92px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: rgba(15, 118, 110, 0.45);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-brand { background: var(--brand); color: #fff; }
+        .btn-brand:hover { background: var(--brand-dark); }
+        .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+        .btn-danger { background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca; }
+        .btn-export { background: #e8f3ff; color: #184b8a; border: 1px solid #bdd8ff; }
+
+        .flash-list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .flash {
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font-size: 0.94rem;
+        }
+
+        .flash-success {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .flash-error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-color: #fecaca;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .legend-item,
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .pill-development,
+        .legend-development {
+            background: var(--development-soft);
+            color: var(--development);
+            border-color: #86efac;
+        }
+
+        .pill-quality,
+        .legend-quality {
+            background: var(--quality-soft);
+            color: var(--quality);
+            border-color: #d8b4fe;
+        }
+
+        .pill-production,
+        .legend-production {
+            background: var(--production-soft);
+            color: var(--production);
+            border-color: #fca5a5;
+        }
+
+        .client-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        details {
+            background: transparent;
+        }
+
+        details[open] summary {
+            margin-bottom: 14px;
+        }
+
+        summary {
+            cursor: pointer;
+            list-style: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .client-card,
+        .project-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .client-head,
+        .project-head,
+        .cr-head,
+        .row-actions,
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .client-title,
+        .project-title {
+            display: grid;
+            gap: 6px;
+        }
+
+        .client-title h2,
+        .project-title h3 {
+            margin: 0;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .project-list,
+        .cr-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .kanban-column {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 249, 247, 0.92));
+            min-height: 180px;
+        }
+
+        .kanban-column.is-drop-target {
+            border-color: rgba(15, 118, 110, 0.48);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.10);
+            transform: translateY(-1px);
+        }
+
+        .kanban-column.is-drop-disabled {
+            border-color: rgba(220, 38, 38, 0.28);
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.08);
+            background: linear-gradient(180deg, rgba(255, 245, 245, 0.96), rgba(246, 249, 247, 0.92));
+        }
+
+        .kanban-column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .kanban-column-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .kanban-column-body {
+            display: grid;
+            gap: 10px;
+        }
+
+        .kanban-empty {
+            border: 1px dashed var(--line);
+            border-radius: 12px;
+            padding: 16px 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.55);
+            text-align: center;
+        }
+
+        .cr-item {
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            padding: 14px;
+            background: #fbfcfb;
+        }
+
+        .cr-item.is-dragging {
+            opacity: 0.45;
+            transform: rotate(1deg) scale(0.99);
+        }
+
+        .cr-item.is-highlighted {
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.18), var(--shadow);
+            border-color: rgba(15, 118, 110, 0.44);
+        }
+
+        .project-card.is-highlighted,
+        .client-card.is-highlighted {
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12), var(--shadow);
+            border-color: rgba(15, 118, 110, 0.36);
+        }
+
+        .cr-item.status-development {
+            border-left: 8px solid var(--development);
+            background: linear-gradient(90deg, rgba(220, 252, 231, 0.72), rgba(251, 252, 251, 1) 24%);
+        }
+
+        .cr-item.status-quality {
+            border-left: 8px solid var(--quality);
+            background: linear-gradient(90deg, rgba(239, 228, 255, 0.9), rgba(251, 252, 251, 1) 24%);
+        }
+
+        .cr-item.status-production {
+            border-left: 8px solid var(--production);
+            background: linear-gradient(90deg, rgba(255, 225, 225, 0.9), rgba(251, 252, 251, 1) 24%);
+        }
+
+        .cr-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .empty {
+            padding: 26px;
+            border: 1px dashed var(--line);
+            border-radius: 16px;
+            color: var(--muted);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .compact-form {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
+        }
+
+        .global-board-card {
+            margin-bottom: 16px;
+        }
+
+        .global-card-meta {
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .global-card-note {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        .global-kanban-card {
+            cursor: pointer;
+        }
+
+        .global-card-link {
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--brand-dark);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1180px) {
+            .top-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .top-grid,
+            .fields,
+            .fields-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+
+            .page {
+                padding: 18px 12px 36px;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <h1>SAP CR Manager</h1>
+            <p>Gestione locale delle Change Request SAP con struttura Cliente → Progetto → CR, note operative e avanzamento del trasporto tra Sviluppo, Quality e Produzione.</p>
+            <div class="hero-meta">
+                <span class="hero-badge">Aggiornato: {{ generated_at }}</span>
+                <span class="hero-badge">Archivio locale JSON</span>
+                <span class="hero-badge">Monitoraggio per cliente e progetto</span>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <section class="flash-list">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+        {% endwith %}
+
+        <section class="top-grid">
+            <article class="metric">
+                <div class="label">Clienti</div>
+                <div class="value">{{ summary.clients }}</div>
+                <small>{{ summary.visible_clients }} visibili con i filtri correnti</small>
+            </article>
+            <article class="metric">
+                <div class="label">Progetti</div>
+                <div class="value">{{ summary.projects }}</div>
+                <small>{{ summary.visible_projects }} visibili con i filtri correnti</small>
+            </article>
+            <article class="metric">
+                <div class="label">CR Totali</div>
+                <div class="value">{{ summary.crs }}</div>
+                <small>{{ summary.visible_crs }} visibili con i filtri correnti</small>
+            </article>
+            <article class="metric status-development">
+                <div class="label">In Sviluppo</div>
+                <div class="value">{{ summary.status_counts.development }}</div>
+                <small>Verde</small>
+            </article>
+            <article class="metric status-quality">
+                <div class="label">In Quality</div>
+                <div class="value">{{ summary.status_counts.quality }}</div>
+                <small>Viola</small>
+            </article>
+            <article class="metric status-production">
+                <div class="label">In Produzione</div>
+                <div class="value">{{ summary.status_counts.production }}</div>
+                <small>Rosso</small>
+            </article>
+        </section>
+
+        <section class="grid-2">
+            <div class="stack">
+                <section class="card">
+                    <h2>Nuovo cliente</h2>
+                    <p>Crea il contenitore principale. Ogni cliente puo avere piu progetti, e ogni progetto contiene la propria lista CR.</p>
+                    <form method="post" action="{{ url_for('add_client') }}" class="fields-1">
+                        <label>
+                            Cliente
+                            <input type="text" name="client_name" placeholder="Es. Cliente ABC" required>
+                        </label>
+                        <button class="btn btn-brand" type="submit">Aggiungi cliente</button>
+                    </form>
+                </section>
+
+                <section class="card">
+                    <h2>Filtri monitoraggio</h2>
+                    <p>Usa i filtri per controllare rapidamente la situazione per fase di trasporto o per parola chiave.</p>
+                    <form method="get" action="{{ url_for('index') }}" class="fields-1">
+                        <label>
+                            Cerca nelle CR
+                            <input type="text" name="q" value="{{ filters.search_text }}" placeholder="ID CR, utente, descrizione, note">
+                        </label>
+                        <label>
+                            Cliente
+                            <select name="client">
+                                <option value="all" {% if filters.client_filter == 'all' %}selected{% endif %}>Tutti i clienti</option>
+                                {% for client_name in filter_options.clients %}
+                                <option value="{{ client_name }}" {% if filters.client_filter == client_name.lower() %}selected{% endif %}>{{ client_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>
+                            Progetto
+                            <select name="project">
+                                <option value="all" {% if filters.project_filter == 'all' %}selected{% endif %}>Tutti i progetti</option>
+                                {% for project_name in filter_options.projects %}
+                                <option value="{{ project_name }}" {% if filters.project_filter == project_name.lower() %}selected{% endif %}>{{ project_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>
+                            Stato trasporto
+                            <select name="status">
+                                <option value="all" {% if filters.status_filter == 'all' %}selected{% endif %}>Tutti</option>
+                                <option value="development" {% if filters.status_filter == 'development' %}selected{% endif %}>Sviluppo</option>
+                                <option value="quality" {% if filters.status_filter == 'quality' %}selected{% endif %}>Quality</option>
+                                <option value="production" {% if filters.status_filter == 'production' %}selected{% endif %}>Produzione</option>
+                            </select>
+                        </label>
+                        <div class="form-actions">
+                            <button class="btn btn-brand" type="submit">Applica filtri</button>
+                            <a class="btn btn-light" href="{{ url_for('index') }}">Reset</a>
+                            <a class="btn btn-export" href="{{ url_for('export_excel', q=filters.search_text, status=filters.status_filter, client=filters.client_filter, project=filters.project_filter) }}">Export Excel</a>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="card">
+                    <h2>Legenda stati</h2>
+                    <div class="legend">
+                        <span class="legend-item legend-development">Sviluppo: CR appena creata</span>
+                        <span class="legend-item legend-quality">Quality: trasportata in collaudo</span>
+                        <span class="legend-item legend-production">Produzione: rilasciata in produzione</span>
+                    </div>
+                    <p style="margin-top: 12px;">Puoi trascinare una card CR da una colonna all'altra per aggiornare lo stato senza aprirla.</p>
+                </section>
+            </div>
+
+            <section>
+                <section class="card global-board-card">
+                    <h2>Board globale</h2>
+                    <p>Vista Kanban trasversale su tutte le CR visibili con i filtri correnti. Ogni card mostra cliente e progetto di appartenenza.</p>
+                    <div class="kanban-board">
+                        {% for column in global_kanban_columns %}
+                        <section class="kanban-column kanban-dropzone" data-status="{{ column.key }}" data-board-scope="global">
+                            <div class="kanban-column-header">
+                                <div class="kanban-column-title">
+                                    <span class="pill pill-{{ column.tone }}">{{ column.label }}</span>
+                                </div>
+                                <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                            </div>
+                            <div class="kanban-column-body">
+                                {% if column.crs %}
+                                    {% for cr in column.crs %}
+                                    <article class="cr-item status-{{ cr.tone }} kanban-draggable global-kanban-card" draggable="true" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
+                                        <div class="cr-head">
+                                            <div>
+                                                <strong>{{ cr.cr_key }}</strong>
+                                                <div class="cr-meta">
+                                                    <span>{{ cr.client_name }}</span>
+                                                    <span>{{ cr.project_name }}</span>
+                                                    <span>Creata da {{ cr.created_by }}</span>
+                                                </div>
+                                            </div>
+                                            <span class="pill pill-{{ cr.tone }}">{{ cr.status_label }}</span>
+                                        </div>
+                                        <div class="global-card-note">{{ cr.description }}</div>
+                                        {% if cr.notes %}
+                                        <div class="global-card-note">Note: {{ cr.notes }}</div>
+                                        {% endif %}
+                                        <div class="global-card-link">Apri dettaglio modificabile</div>
+                                    </article>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="kanban-empty">Nessuna CR in {{ column.label }}.</div>
+                                {% endif %}
+                            </div>
+                        </section>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                {% if clients %}
+                <div class="client-list">
+                    {% for client in clients %}
+                    <details id="client-{{ client.id }}" class="client-card" open>
+                        <summary>
+                            <div class="client-head">
+                                <div class="client-title">
+                                    <h2>{{ client.name }}</h2>
+                                    <div class="meta-row">
+                                        <span class="pill pill-development">{{ client.project_count }} progetti</span>
+                                        <span class="pill pill-quality">{{ client.cr_count }} CR totali</span>
+                                    </div>
+                                </div>
+                                <form method="post" action="{{ url_for('delete_client', client_id=client.id) }}" onsubmit="return confirm('Eliminare il cliente e tutti i suoi progetti?');">
+                                    <button class="btn btn-danger" type="submit">Elimina cliente</button>
+                                </form>
+                            </div>
+                        </summary>
+
+                        <form method="post" action="{{ url_for('add_project', client_id=client.id) }}" class="compact-form">
+                            <div class="fields-1">
+                                <label>
+                                    Nuovo progetto per {{ client.name }}
+                                    <input type="text" name="project_name" placeholder="Es. Rollout FI, Supporto MM, Conversione dati" required>
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-brand" type="submit">Aggiungi progetto</button>
+                            </div>
+                        </form>
+
+                        <div class="project-list">
+                            {% for project in client.projects %}
+                            <article id="project-{{ client.id }}-{{ project.id }}" class="project-card">
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <h3>{{ project.name }}</h3>
+                                        <div class="meta-row">
+                                            <span class="pill pill-development">{{ project.cr_count }} CR nel progetto</span>
+                                        </div>
+                                    </div>
+                                    <form method="post" action="{{ url_for('delete_project', client_id=client.id, project_id=project.id) }}" onsubmit="return confirm('Eliminare il progetto e tutte le CR associate?');">
+                                        <button class="btn btn-light" type="submit">Elimina progetto</button>
+                                    </form>
+                                </div>
+
+                                <form method="post" action="{{ url_for('add_cr', client_id=client.id, project_id=project.id) }}" class="compact-form">
+                                    <div class="fields-3">
+                                        <label>
+                                            ID CR
+                                            <input type="text" name="cr_key" placeholder="Es. DEVK900123" required>
+                                        </label>
+                                        <label>
+                                            Creata da
+                                            <input type="text" name="created_by" placeholder="Utente SAP" required>
+                                        </label>
+                                        <label>
+                                            Descrizione
+                                            <input type="text" name="description" placeholder="Breve descrizione della CR" required>
+                                        </label>
+                                    </div>
+                                    <div class="fields-1">
+                                        <label>
+                                            Note operative
+                                            <textarea name="notes" placeholder="Es. Trasportata in Quality, da non rilasciare in Produzione finche il test non e approvato."></textarea>
+                                        </label>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button class="btn btn-brand" type="submit">Aggiungi CR</button>
+                                    </div>
+                                </form>
+
+                                <div class="kanban-board">
+                                    {% for column in project.kanban_columns %}
+                                    <section class="kanban-column kanban-dropzone" data-status="{{ column.key }}" data-board-scope="project" data-client-id="{{ client.id }}" data-project-id="{{ project.id }}">
+                                        <div class="kanban-column-header">
+                                            <div class="kanban-column-title">
+                                                <span class="pill pill-{{ column.tone }}">{{ column.label }}</span>
+                                            </div>
+                                            <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                                        </div>
+
+                                        <div class="kanban-column-body">
+                                            {% if column.crs %}
+                                                {% for cr in column.crs %}
+                                                <article id="detail-{{ client.id }}-{{ project.id }}-{{ cr.id }}" class="cr-item status-{{ cr.tone }} kanban-draggable" draggable="true" data-client-id="{{ client.id }}" data-project-id="{{ project.id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}">
+                                                    <div class="cr-head">
+                                                        <div>
+                                                            <strong>{{ cr.cr_key }}</strong>
+                                                            <div class="cr-meta">
+                                                                <span>Creata da {{ cr.created_by }}</span>
+                                                                <span>Inserita {{ cr.created_at.replace('T', ' ') }}</span>
+                                                                <span>Aggiornata {{ cr.updated_at.replace('T', ' ') }}</span>
+                                                            </div>
+                                                        </div>
+                                                        <span class="pill pill-{{ cr.tone }}">{{ cr.status_label }}</span>
+                                                    </div>
+
+                                                    <form method="post" action="{{ url_for('update_cr', client_id=client.id, project_id=project.id, cr_id=cr.id) }}" class="compact-form">
+                                                        <div class="fields-3">
+                                                            <label>
+                                                                ID CR
+                                                                <input type="text" name="cr_key" value="{{ cr.cr_key }}" required>
+                                                            </label>
+                                                            <label>
+                                                                Creata da
+                                                                <input type="text" name="created_by" value="{{ cr.created_by }}" required>
+                                                            </label>
+                                                            <label>
+                                                                Stato trasporto
+                                                                <select name="status">
+                                                                    <option value="development" {% if cr.status == 'development' %}selected{% endif %}>Sviluppo</option>
+                                                                    <option value="quality" {% if cr.status == 'quality' %}selected{% endif %}>Quality</option>
+                                                                    <option value="production" {% if cr.status == 'production' %}selected{% endif %}>Produzione</option>
+                                                                </select>
+                                                            </label>
+                                                        </div>
+                                                        <div class="fields-1">
+                                                            <label>
+                                                                Descrizione
+                                                                <input type="text" name="description" value="{{ cr.description }}" required>
+                                                            </label>
+                                                            <label>
+                                                                Note operative
+                                                                <textarea name="notes">{{ cr.notes }}</textarea>
+                                                            </label>
+                                                        </div>
+                                                        <div class="row-actions">
+                                                            <button class="btn btn-brand" type="submit">Salva modifiche</button>
+                                                        </div>
+                                                    </form>
+
+                                                    <form method="post" action="{{ url_for('delete_cr', client_id=client.id, project_id=project.id, cr_id=cr.id) }}" onsubmit="return confirm('Eliminare questa CR?');" style="margin-top: 10px;">
+                                                        <button class="btn btn-danger" type="submit">Elimina CR</button>
+                                                    </form>
+                                                </article>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="kanban-empty">Nessuna CR in {{ column.label }}.</div>
+                                            {% endif %}
+                                        </div>
+                                    </section>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty">
+                    Nessun dato disponibile. Aggiungi il primo cliente per iniziare a tracciare le CR SAP.
+                </div>
+                {% endif %}
+            </section>
+        </section>
+    </main>
+    <script>
+        (() => {
+            const draggableCards = document.querySelectorAll('.kanban-draggable');
+            const dropzones = document.querySelectorAll('.kanban-dropzone');
+            const globalCards = document.querySelectorAll('.global-kanban-card');
+            let activeDragPayload = null;
+
+            const clearDropTargets = () => {
+                dropzones.forEach((zone) => {
+                    zone.classList.remove('is-drop-target');
+                    zone.classList.remove('is-drop-disabled');
+                });
+                draggableCards.forEach((card) => card.classList.remove('is-dragging'));
+            };
+
+            const canDropInZone = (zone, payload) => {
+                if (!zone || !payload) {
+                    return false;
+                }
+
+                if (zone.dataset.boardScope === 'global') {
+                    return true;
+                }
+
+                return zone.dataset.clientId === payload.clientId && zone.dataset.projectId === payload.projectId;
+            };
+
+            const flashElement = (element) => {
+                if (!element) {
+                    return;
+                }
+
+                element.classList.add('is-highlighted');
+                window.setTimeout(() => {
+                    element.classList.remove('is-highlighted');
+                }, 1800);
+            };
+
+            const highlightDetailCard = (targetId) => {
+                const target = document.getElementById(targetId);
+                if (!target) {
+                    return;
+                }
+
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                flashElement(target);
+            };
+
+            const openClientAndProject = (clientTargetId, projectTargetId) => {
+                const clientDetails = document.getElementById(clientTargetId);
+                const projectCard = document.getElementById(projectTargetId);
+
+                if (clientDetails && !clientDetails.open) {
+                    clientDetails.open = true;
+                }
+
+                if (clientDetails) {
+                    flashElement(clientDetails);
+                }
+
+                if (projectCard) {
+                    projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    flashElement(projectCard);
+                }
+            };
+
+            const updateStatus = async (card, nextStatus) => {
+                const clientId = card.dataset.clientId;
+                const projectId = card.dataset.projectId;
+                const crId = card.dataset.crId;
+                const currentStatus = card.dataset.currentStatus;
+
+                if (!clientId || !projectId || !crId || !nextStatus || currentStatus === nextStatus) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/clients/${clientId}/projects/${projectId}/crs/${crId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: nextStatus })
+                    });
+
+                    const payload = await response.json();
+                    if (!response.ok || !payload.ok) {
+                        throw new Error(payload.message || 'Aggiornamento stato non riuscito.');
+                    }
+
+                    window.location.reload();
+                } catch (error) {
+                    alert(error.message || 'Aggiornamento stato non riuscito.');
+                }
+            };
+
+            draggableCards.forEach((card) => {
+                card.addEventListener('dragstart', (event) => {
+                    card.classList.add('is-dragging');
+                    activeDragPayload = {
+                        clientId: card.dataset.clientId,
+                        projectId: card.dataset.projectId,
+                        crId: card.dataset.crId,
+                        currentStatus: card.dataset.currentStatus,
+                    };
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', JSON.stringify(activeDragPayload));
+                });
+
+                card.addEventListener('dragend', () => {
+                    activeDragPayload = null;
+                    clearDropTargets();
+                });
+            });
+
+            globalCards.forEach((card) => {
+                card.addEventListener('click', (event) => {
+                    if (event.target.closest('form, button, input, textarea, select, a')) {
+                        return;
+                    }
+                    openClientAndProject(card.dataset.clientTarget, card.dataset.projectTarget);
+                    highlightDetailCard(card.dataset.detailTarget);
+                });
+            });
+
+            dropzones.forEach((zone) => {
+                zone.addEventListener('dragover', (event) => {
+                    const payload = activeDragPayload;
+                    if (!canDropInZone(zone, payload)) {
+                        zone.classList.add('is-drop-disabled');
+                        zone.classList.remove('is-drop-target');
+                        return;
+                    }
+
+                    event.preventDefault();
+                    zone.classList.remove('is-drop-disabled');
+                    zone.classList.add('is-drop-target');
+                    event.dataTransfer.dropEffect = 'move';
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('is-drop-target');
+                    zone.classList.remove('is-drop-disabled');
+                });
+
+                zone.addEventListener('drop', async (event) => {
+                    zone.classList.remove('is-drop-target');
+                    zone.classList.remove('is-drop-disabled');
+
+                    const raw = event.dataTransfer.getData('text/plain');
+                    if (!raw) {
+                        return;
+                    }
+
+                    let payload;
+                    try {
+                        payload = JSON.parse(raw);
+                    } catch (_error) {
+                        return;
+                    }
+
+                    if (!canDropInZone(zone, payload)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const card = document.querySelector(
+                        `.kanban-draggable[data-client-id="${payload.clientId}"][data-project-id="${payload.projectId}"][data-cr-id="${payload.crId}"]`
+                    );
+                    await updateStatus(card, zone.dataset.status);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
