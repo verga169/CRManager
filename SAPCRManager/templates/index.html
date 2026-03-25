@@ -209,7 +209,13 @@
 
         .fields-cr {
             display: grid;
-            grid-template-columns: 80px 170px 1fr 1fr 1fr;
+            grid-template-columns: 60px 148px 2fr 2fr 2fr;
+            gap: 10px;
+        }
+
+        .fields-cr-edit {
+            display: grid;
+            grid-template-columns: 60px 148px 2fr 2fr;
             gap: 10px;
         }
 
@@ -234,7 +240,7 @@
 
         textarea {
             min-height: 92px;
-            resize: vertical;
+            resize: none;
         }
 
         input:focus,
@@ -288,13 +294,6 @@
             border-color: #f0b6b6;
         }
 
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .legend-item,
         .pill {
             display: inline-flex;
             align-items: center;
@@ -306,29 +305,19 @@
             border: 1px solid transparent;
         }
 
-        .legend-item {
-            flex: 1 1 100%;
-            justify-content: center;
-            text-align: center;
-            min-height: 38px;
-        }
-
-        .pill-development,
-        .legend-development {
+        .pill-development {
             background: var(--development-soft);
             color: var(--development);
             border-color: #b7dec2;
         }
 
-        .pill-quality,
-        .legend-quality {
+        .pill-quality {
             background: var(--quality-soft);
             color: var(--quality);
             border-color: #f3d18c;
         }
 
-        .pill-production,
-        .legend-production {
+        .pill-production {
             background: var(--production-soft);
             color: var(--production);
             border-color: #f0b6b6;
@@ -445,11 +434,6 @@
 
         .project-title h3 {
             font-size: 1.14rem;
-        }
-
-        .project-subtitle {
-            font-size: 0.82rem;
-            color: var(--muted);
         }
 
         .meta-row {
@@ -695,6 +679,12 @@
             border-top: 1px solid var(--line);
         }
 
+        .cr-extra > .compact-form {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
         .project-cr-section-title {
             margin: 0;
             font-size: 0.82rem;
@@ -776,13 +766,6 @@
             background: var(--brand);
             border-color: var(--brand);
             color: #fff;
-        }
-
-        .global-card-meta {
-            margin-top: 6px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
         }
 
         .global-card-note {
@@ -934,8 +917,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .cr-created-by {
-                max-width: none;
+            .fields-cr-edit {
+                grid-template-columns: 1fr;
             }
 
             .cr-summary-side {
@@ -1192,16 +1175,8 @@
                                                     </div>
 
                                                     <div class="cr-extra">
-                                                    <div class="cr-meta">
-                                                        <span>Ordine {{ cr.release_order }}</span>
-                                                        <span>{{ cr.cr_type_label }}</span>
-                                                        <span>Creata da {{ cr.created_by }}</span>
-                                                        <span>Inserita {{ cr.created_at }}</span>
-                                                        <span>Aggiornata {{ cr.updated_at }}</span>
-                                                    </div>
-
                                                     <form id="update-cr-{{ cr.id }}" method="post" action="{{ url_for('update_cr', client_id=client.id, project_id=project.id, cr_id=cr.id) }}" class="compact-form">
-                                                        <div class="fields-cr">
+                                                        <div class="fields-cr-edit">
                                                             <label>
                                                                 Ordine
                                                                 <input type="text" value="{{ cr.release_order }}" readonly>

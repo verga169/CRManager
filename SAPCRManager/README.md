@@ -9,10 +9,11 @@ Applicazione Flask locale per gestire Change Request SAP organizzate per cliente
 - Campi CR: ordine rilascio, tipo (`Workbench`/`Customizing`), Richiesta, utente creatore, descrizione, note operative, stato trasporto
 - Stati colore:
   - `Sviluppo` -> verde
-  - `Quality` -> viola
+  - `Quality` -> giallo-arancio
   - `Produzione` -> rosso
+- Lo stato trasporto si modifica esclusivamente tramite drag and drop sulla board Kanban
 - Ordinamento CR per sequenza di rilascio (ordine crescente), con ordine univoco all'interno del progetto
-- Dashboard con contatori e filtri per stato, tipo CR o testo libero
+- Dashboard con contatori per cliente/progetto/CR
 - Export per singolo progetto direttamente dalla card progetto:
   - Excel (.xlsx)
   - PDF (.pdf) con layout tabellare formattato
