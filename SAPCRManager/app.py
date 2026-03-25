@@ -70,6 +70,23 @@ def now_iso() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 
+_IT_MONTHS = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
+
+
+def format_it_datetime(iso_str: str) -> str:
+    """Convert an ISO timestamp to Italian format: 25 Mar 2026 14:30"""
+    try:
+        dt = datetime.fromisoformat(iso_str)
+        return f"{dt.day:02d} {_IT_MONTHS[dt.month - 1]} {dt.year} {dt.hour:02d}:{dt.minute:02d}"
+    except (ValueError, TypeError, AttributeError):
+        return iso_str or "-"
+
+
+def now_it_datetime() -> str:
+    dt = datetime.now()
+    return f"{dt.day:02d} {_IT_MONTHS[dt.month - 1]} {dt.year} {dt.hour:02d}:{dt.minute:02d}"
+
+
 def ensure_data_file() -> None:
     if os.path.exists(DATA_FILE):
         return
@@ -316,8 +333,6 @@ def build_export_rows(
                         "description": sanitize_text(cr.get("description")),
                         "notes": sanitize_text(cr.get("notes")),
                         "status": STATUS_META[status]["label"],
-                        "created_at": sanitize_text(cr.get("created_at")).replace("T", " "),
-                        "updated_at": sanitize_text(cr.get("updated_at")).replace("T", " "),
                     }
                 )
 
@@ -351,8 +366,6 @@ def build_project_export_rows(client_id: str, project_id: str) -> dict:
                 "description": sanitize_text(cr.get("description")),
                 "notes": sanitize_text(cr.get("notes")),
                 "status": STATUS_META[status]["label"],
-                "created_at": sanitize_text(cr.get("created_at")).replace("T", " "),
-                "updated_at": sanitize_text(cr.get("updated_at")).replace("T", " "),
             }
         )
 
@@ -397,13 +410,11 @@ def build_excel_workbook(
         "Progetto",
         "Ordine",
         "Tipo CR",
-        "ID CR",
+        "Richiesta",
         "Creata da",
         "Descrizione",
         "Note",
         "Stato",
-        "Creata il",
-        "Aggiornata il",
     ]
     worksheet.append(headers)
 
@@ -422,8 +433,6 @@ def build_excel_workbook(
                 row["description"],
                 row["notes"],
                 row["status"],
-                row["created_at"],
-                row["updated_at"],
             ]
         )
 
@@ -446,19 +455,17 @@ def build_project_excel_workbook(client_id: str, project_id: str) -> io.BytesIO:
 
     worksheet.append(["Cliente", payload["client_name"]])
     worksheet.append(["Progetto", payload["project_name"]])
-    worksheet.append(["Generato il", datetime.now().strftime("%d/%m/%Y %H:%M")])
+    worksheet.append(["Generato il", now_it_datetime()])
     worksheet.append([])
 
     headers = [
         "Ordine",
         "Tipo CR",
-        "ID CR",
+        "Richiesta",
         "Creata da",
         "Descrizione",
         "Note",
         "Stato",
-        "Creata il",
-        "Aggiornata il",
     ]
     worksheet.append(headers)
 
@@ -476,8 +483,6 @@ def build_project_excel_workbook(client_id: str, project_id: str) -> io.BytesIO:
                 row["description"],
                 row["notes"],
                 row["status"],
-                row["created_at"],
-                row["updated_at"],
             ]
         )
 
@@ -525,11 +530,11 @@ def build_project_pdf_document(client_id: str, project_id: str) -> io.BytesIO:
         Paragraph("SAP CR Manager - Export Progetto", title_style),
         Paragraph(f"<b>Cliente:</b> {payload['client_name']}", meta_style),
         Paragraph(f"<b>Progetto:</b> {payload['project_name']}", meta_style),
-        Paragraph(f"<b>Generato il:</b> {datetime.now().strftime('%d/%m/%Y %H:%M')}", meta_style),
+        Paragraph(f"<b>Generato il:</b> {now_it_datetime()}", meta_style),
         Spacer(1, 8),
     ]
 
-    table_data = [["Ordine", "Tipo", "ID CR", "Creata da", "Stato", "Descrizione", "Note", "Aggiornata il"]]
+    table_data = [["Ordine", "Tipo", "Richiesta", "Creata da", "Stato", "Descrizione", "Note"]]
     for row in rows:
         table_data.append(
             [
@@ -540,17 +545,16 @@ def build_project_pdf_document(client_id: str, project_id: str) -> io.BytesIO:
                 row["status"],
                 row["description"],
                 row["notes"],
-                row["updated_at"],
             ]
         )
 
     if len(table_data) == 1:
-        table_data.append(["-", "-", "Nessuna CR", "-", "-", "-", "-", "-"])
+        table_data.append(["-", "-", "Nessuna CR", "-", "-", "-", "-"])
 
     table = Table(
         table_data,
         repeatRows=1,
-        colWidths=[16 * mm, 25 * mm, 26 * mm, 30 * mm, 24 * mm, 62 * mm, 62 * mm, 30 * mm],
+        colWidths=[16 * mm, 25 * mm, 26 * mm, 30 * mm, 24 * mm, 76 * mm, 76 * mm],
     )
     table.setStyle(
         TableStyle(
@@ -643,6 +647,8 @@ def build_view_model(
                 decorated_cr["project_name"] = project_name
                 decorated_cr["client_id"] = client["id"]
                 decorated_cr["project_id"] = project["id"]
+                decorated_cr["created_at"] = format_it_datetime(cr.get("created_at", ""))
+                decorated_cr["updated_at"] = format_it_datetime(cr.get("updated_at", ""))
                 decorated_crs.append(decorated_cr)
                 global_crs.append(decorated_cr)
 
@@ -705,7 +711,7 @@ def build_view_model(
         "status_meta": STATUS_META,
         "cr_type_meta": CR_TYPE_META,
         "global_kanban_columns": build_global_kanban_columns(global_crs),
-        "generated_at": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "generated_at": now_it_datetime(),
     }
 
 
@@ -910,7 +916,7 @@ def add_cr(client_id: str, project_id: str):
     release_order = normalize_release_order(request.form.get("release_order"), fallback=0)
 
     if not cr_key or not created_by or not description:
-        flash("Compila ID CR, utente creatore e descrizione.", "error")
+        flash("Compila Richiesta, utente creatore e descrizione.", "error")
         return redirect(url_for("index"))
 
     data = load_data()
@@ -925,11 +931,19 @@ def add_cr(client_id: str, project_id: str):
         return redirect(url_for("index"))
 
     if any(item.get("cr_key", "").lower() == cr_key.lower() for item in project.get("crs", [])):
-        flash("Esiste gia una CR con questo ID nel progetto selezionato.", "error")
+        flash("Esiste gia una CR con questa richiesta nel progetto selezionato.", "error")
         return redirect(url_for("index"))
 
+    minimum_release_order = next_release_order(project)
     if release_order < 1:
-        release_order = next_release_order(project)
+        release_order = minimum_release_order
+
+    if release_order < minimum_release_order:
+        flash(
+            f"Ordine CR non valido. Per questo progetto il prossimo ordine disponibile e {minimum_release_order}.",
+            "error",
+        )
+        return redirect(url_for("index"))
 
     if has_release_order_conflict(project, release_order):
         flash("Ordine CR gia usato nel progetto. Scegli un ordine diverso.", "error")
@@ -977,33 +991,21 @@ def update_cr(client_id: str, project_id: str, cr_id: str):
     created_by = sanitize_text(request.form.get("created_by"))
     description = sanitize_text(request.form.get("description"))
     notes = sanitize_text(request.form.get("notes"))
-    status = normalize_status(request.form.get("status"))
     cr_type = normalize_cr_type(request.form.get("cr_type"))
-    release_order = normalize_release_order(request.form.get("release_order"), fallback=0)
 
     if not cr_key or not created_by or not description:
-        flash("ID CR, utente creatore e descrizione sono obbligatori.", "error")
+        flash("Richiesta, utente creatore e descrizione sono obbligatori.", "error")
         return redirect(url_for("index"))
 
     if any(item.get("id") != cr_id and item.get("cr_key", "").lower() == cr_key.lower() for item in project.get("crs", [])):
-        flash("Nel progetto esiste gia un'altra CR con questo ID.", "error")
-        return redirect(url_for("index"))
-
-    if release_order < 1:
-        flash("Ordine CR non valido. Inserisci un numero maggiore di zero.", "error")
-        return redirect(url_for("index"))
-
-    if has_release_order_conflict(project, release_order, exclude_cr_id=cr_id):
-        flash("Ordine CR gia usato nel progetto. Scegli un ordine diverso.", "error")
+        flash("Nel progetto esiste gia un'altra CR con questa richiesta.", "error")
         return redirect(url_for("index"))
 
     cr["cr_key"] = cr_key
     cr["created_by"] = created_by
     cr["description"] = description
     cr["notes"] = notes
-    cr["status"] = status
     cr["cr_type"] = cr_type
-    cr["release_order"] = release_order
     cr["updated_at"] = now_iso()
     save_data(data)
     flash("CR aggiornata.", "success")

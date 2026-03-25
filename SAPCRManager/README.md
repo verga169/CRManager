@@ -6,7 +6,7 @@ Applicazione Flask locale per gestire Change Request SAP organizzate per cliente
 
 - Persistenza locale su `data_store.json`
 - Struttura gerarchica `Cliente -> Progetto -> CR`
-- Campi CR: ordine rilascio, tipo (`Workbench`/`Customizing`), ID CR, utente creatore, descrizione, note operative, stato trasporto
+- Campi CR: ordine rilascio, tipo (`Workbench`/`Customizing`), Richiesta, utente creatore, descrizione, note operative, stato trasporto
 - Stati colore:
   - `Sviluppo` -> verde
   - `Quality` -> viola
