@@ -507,9 +507,11 @@
         }
 
         .cr-item {
+            position: relative;
+            overflow: hidden;
             border-radius: 16px;
             border: 1px solid var(--line);
-            padding: 8px 10px;
+            padding: 8px 10px 8px 36px;
             background: #ffffff;
         }
 
@@ -529,16 +531,35 @@
             border-color: rgba(0, 112, 242, 0.36);
         }
 
-        .cr-item.status-development {
-            border-left: 8px solid var(--development);
+        .cr-type-rail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-transform: uppercase;
+            font-size: 0.52rem;
+            line-height: 1;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            user-select: none;
         }
 
-        .cr-item.status-quality {
-            border-left: 8px solid var(--quality);
+        .cr-item.type-workbench .cr-type-rail {
+            background: #dcebfb;
+            color: #0a5eb7;
+            border-right: 1px solid #b8d6f5;
         }
 
-        .cr-item.status-production {
-            border-left: 8px solid var(--production);
+        .cr-item.type-customizing .cr-type-rail {
+            background: #e2f4e8;
+            color: #0d6b35;
+            border-right: 1px solid #b7dec2;
         }
 
         .cr-summary {
@@ -613,30 +634,6 @@
         .cr-summary-side .pill {
             padding: 5px 9px;
             font-size: 0.76rem;
-
-                .type-tag {
-                    display: inline-flex;
-                    align-items: center;
-                    border-radius: 4px;
-                    padding: 3px 7px;
-                    font-size: 0.72rem;
-                    font-weight: 700;
-                    letter-spacing: 0.02em;
-                    border: 1px solid transparent;
-                    flex-shrink: 0;
-                }
-
-                .type-tag-workbench {
-                    background: var(--brand-soft);
-                    color: var(--brand);
-                    border-color: #b3d4f5;
-                }
-
-                .type-tag-customizing {
-                    background: var(--development-soft);
-                    color: var(--development);
-                    border-color: #b7dec2;
-                }
         }
 
         .cr-expand-hint {
@@ -1030,7 +1027,8 @@
                             <div class="kanban-column-body">
                                 {% if column.crs %}
                                     {% for cr in column.crs %}
-                                    <article class="cr-item status-{{ cr.tone }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
+                                    <article class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
+                                        <div class="cr-type-rail" aria-hidden="true">{{ cr.cr_type_label }}</div>
                                         <div class="cr-summary" data-cr-toggle>
                                             <div class="cr-summary-main">
                                                 <div class="cr-summary-field">
@@ -1043,7 +1041,6 @@
                                                 </div>
                                             </div>
                                             <div class="cr-summary-side">
-                                                <span class="type-tag type-tag-{{ cr.cr_type }}">{{ cr.cr_type_label }}</span>
                                                 <span class="pill pill-{{ cr.tone }}">{{ cr.status_label }}</span>
                                                 <span class="cr-expand-hint" aria-hidden="true"></span>
                                             </div>
@@ -1106,12 +1103,12 @@
 
                         <div class="project-list">
                             {% for project in client.projects %}
-                            <article id="project-{{ client.id }}-{{ project.id }}" class="project-card">
+                            <article id="project-{{ client.id }}-{{ project.id }}" class="project-card is-collapsed">
                                 <div class="project-head">
                                     <div class="project-title">
                                         <span class="project-chip">Progetto</span>
                                         <div class="project-title-row">
-                                            <button class="project-toggle" type="button" data-project-toggle="project-{{ client.id }}-{{ project.id }}" aria-expanded="true" aria-label="Comprimi progetto" title="Comprimi progetto"></button>
+                                            <button class="project-toggle" type="button" data-project-toggle="project-{{ client.id }}-{{ project.id }}" aria-expanded="false" aria-label="Espandi progetto" title="Espandi progetto"></button>
                                             <h3>{{ project.name }}</h3>
                                         </div>
                                         <div class="meta-row">
@@ -1180,7 +1177,8 @@
                                         <div class="kanban-column-body">
                                             {% if column.crs %}
                                                 {% for cr in column.crs %}
-                                                <article id="detail-{{ client.id }}-{{ project.id }}-{{ cr.id }}" class="cr-item status-{{ cr.tone }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ client.id }}" data-project-id="{{ project.id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}">
+                                                <article id="detail-{{ client.id }}-{{ project.id }}-{{ cr.id }}" class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ client.id }}" data-project-id="{{ project.id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}">
+                                                    <div class="cr-type-rail" aria-hidden="true">{{ cr.cr_type_label }}</div>
                                                     <div class="cr-summary" data-cr-toggle>
                                                         <div class="cr-summary-main">
                                                             <div class="cr-summary-field">
