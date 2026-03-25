@@ -511,7 +511,8 @@
             overflow: hidden;
             border-radius: 16px;
             border: 1px solid var(--line);
-            padding: 8px 10px 8px 36px;
+            min-height: 72px;
+            padding: 10px 10px 10px 40px;
             background: #ffffff;
         }
 
@@ -536,7 +537,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 28px;
+            width: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -545,8 +546,9 @@
             text-transform: uppercase;
             font-size: 0.52rem;
             line-height: 1;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             font-weight: 800;
+            padding: 6px 0;
             user-select: none;
         }
 
@@ -598,13 +600,14 @@
 
         .cr-summary-value {
             min-width: 0;
+            color: var(--shell);
         }
 
         .cr-key {
             margin: 0;
             font-size: 0.96rem;
             font-weight: 800;
-            color: var(--ink);
+            color: var(--shell);
             line-height: 1.2;
             min-width: 64px;
             flex: 0 0 auto;
@@ -614,7 +617,7 @@
             margin: 0;
             font-size: 0.9rem;
             font-weight: 700;
-            color: #23332f;
+            color: var(--shell);
             line-height: 1.3;
             flex: 1;
             min-width: 0;
@@ -1017,7 +1020,7 @@
                     <h2>Board globale</h2>
                     <div class="kanban-board">
                         {% for column in global_kanban_columns %}
-                        <section class="kanban-column kanban-dropzone" data-status="{{ column.key }}" data-board-scope="global">
+                        <section class="kanban-column" data-status="{{ column.key }}" data-board-scope="global">
                             <div class="kanban-column-header">
                                 <div class="kanban-column-title">
                                     <span class="pill pill-{{ column.tone }}">{{ column.label }}</span>
@@ -1027,7 +1030,7 @@
                             <div class="kanban-column-body">
                                 {% if column.crs %}
                                     {% for cr in column.crs %}
-                                    <article class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
+                                    <article class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} cr-expandable" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
                                         <div class="cr-type-rail" aria-hidden="true">{{ cr.cr_type_label }}</div>
                                         <div class="cr-summary" data-cr-toggle>
                                             <div class="cr-summary-main">
@@ -1301,8 +1304,8 @@
     </main>
     <script>
         (() => {
-            const draggableCards = document.querySelectorAll('.kanban-draggable');
-            const dropzones = document.querySelectorAll('.kanban-dropzone');
+            const draggableCards = document.querySelectorAll('.kanban-dropzone .kanban-draggable');
+            const dropzones = document.querySelectorAll('.kanban-dropzone[data-board-scope="project"]');
             const projectToggles = document.querySelectorAll('[data-project-toggle]');
             const crToggleAreas = document.querySelectorAll('[data-cr-toggle]');
             const openDetailButtons = document.querySelectorAll('[data-open-detail]');
