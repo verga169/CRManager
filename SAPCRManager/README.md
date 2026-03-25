@@ -27,4 +27,6 @@ Oppure su Windows con doppio click dal workspace root:
 avvia_sap_cr_manager.bat
 ```
 
-L'app risponde su `http://127.0.0.1:5000`.
+L'app risponde su `http://127.0.0.1:5055`.
+
+Per cambiare porta puoi impostare la variabile ambiente `SAP_CR_MANAGER_PORT` prima dell'avvio.

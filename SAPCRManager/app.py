@@ -13,6 +13,8 @@ app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "data_store.json")
+APP_PORT = int(os.environ.get("SAP_CR_MANAGER_PORT", "5055"))
+APP_DEBUG = (os.environ.get("SAP_CR_MANAGER_DEBUG", "0").strip() == "1")
 
 app.secret_key = os.environ.get("SAP_CR_MANAGER_SECRET_KEY", "sap-cr-manager-dev-secret")
 
@@ -717,4 +719,4 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=APP_DEBUG, use_reloader=APP_DEBUG, host="0.0.0.0", port=APP_PORT)

@@ -561,7 +561,7 @@
     <main class="page">
         <section class="hero">
             <h1>SAP CR Manager</h1>
-            <p>Gestione locale delle Change Request SAP con struttura Cliente → Progetto → CR, note operative e avanzamento del trasporto tra Sviluppo, Quality e Produzione.</p>
+            <p>Gestione locale delle Change Request SAP.</p>
             <div class="hero-meta">
                 <span class="hero-badge">Aggiornato: {{ generated_at }}</span>
                 <span class="hero-badge">Archivio locale JSON</span>
@@ -620,7 +620,7 @@
                     <form method="post" action="{{ url_for('add_client') }}" class="fields-1">
                         <label>
                             Cliente
-                            <input type="text" name="client_name" placeholder="Es. Cliente ABC" required>
+                            <input type="text" name="client_name" placeholder="Nuovo Cliente" required>
                         </label>
                         <button class="btn btn-brand" type="submit">Aggiungi cliente</button>
                     </form>

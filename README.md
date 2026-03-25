@@ -37,7 +37,7 @@ Il launcher:
 - controlla che `py` sia disponibile
 - installa le dipendenze se necessario
 - avvia l'app locale
-- apre il browser su `http://127.0.0.1:5000`
+- apre il browser su `http://127.0.0.1:5055`
 
 ## Avvio manuale
 
@@ -46,6 +46,8 @@ cd SAPCRManager
 py -m pip install -r requirements.txt
 py app.py
 ```
+
+Per cambiare porta puoi impostare la variabile ambiente `SAP_CR_MANAGER_PORT`.
 
 ## Persistenza dati locale
 
