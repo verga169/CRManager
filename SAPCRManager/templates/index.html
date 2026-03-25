@@ -286,6 +286,13 @@
             border: 1px solid transparent;
         }
 
+        .legend-item {
+            flex: 1 1 100%;
+            justify-content: center;
+            text-align: center;
+            min-height: 38px;
+        }
+
         .pill-development,
         .legend-development {
             background: var(--development-soft);
@@ -747,7 +754,7 @@
                             <div class="fields-1">
                                 <label>
                                     Nuovo progetto per {{ client.name }}
-                                    <input type="text" name="project_name" placeholder="Es. Rollout FI, Supporto MM, Conversione dati" required>
+                                    <input type="text" name="project_name" placeholder="Nuovo Progetto" required>
                                 </label>
                             </div>
                             <div class="form-actions">
@@ -774,21 +781,21 @@
                                     <div class="fields-3">
                                         <label>
                                             ID CR
-                                            <input type="text" name="cr_key" placeholder="Es. DEVK900123" required>
+                                            <input type="text" name="cr_key" placeholder="Nuova CR" required>
                                         </label>
                                         <label>
                                             Creata da
-                                            <input type="text" name="created_by" placeholder="Utente SAP" required>
+                                            <input type="text" name="created_by" placeholder="Creato da" required>
                                         </label>
                                         <label>
                                             Descrizione
-                                            <input type="text" name="description" placeholder="Breve descrizione della CR" required>
+                                            <input type="text" name="description" placeholder="Descrizione" required>
                                         </label>
                                     </div>
                                     <div class="fields-1">
                                         <label>
                                             Note operative
-                                            <textarea name="notes" placeholder="Es. Trasportata in Quality, da non rilasciare in Produzione finche il test non e approvato."></textarea>
+                                            <textarea name="notes" placeholder="Note"></textarea>
                                         </label>
                                     </div>
                                     <div class="form-actions">
@@ -870,6 +877,12 @@
                                 </div>
                             </article>
                             {% endfor %}
+
+                            {% if not client.projects %}
+                            <div class="empty">
+                                Nessun progetto ancora presente per {{ client.name }}. Aggiungi il primo progetto per iniziare a inserire le CR.
+                            </div>
+                            {% endif %}
                         </div>
                     </details>
                     {% endfor %}

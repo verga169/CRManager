@@ -4,7 +4,10 @@ setlocal
 pushd "%~dp0SAPCRManager"
 
 set SAP_CR_MANAGER_PORT=5055
-set SAP_CR_MANAGER_DEBUG=0
+set SAP_CR_MANAGER_DEBUG=1
+
+set APP_MODE=development
+
 set APP_URL=http://127.0.0.1:%SAP_CR_MANAGER_PORT%
 set HEALTH_URL=%APP_URL%/health
 
@@ -30,7 +33,7 @@ if errorlevel 1 (
 	)
 )
 
-start "SAP CR Manager" cmd /k set SAP_CR_MANAGER_PORT=%SAP_CR_MANAGER_PORT%^& set SAP_CR_MANAGER_DEBUG=%SAP_CR_MANAGER_DEBUG%^& py app.py
+start "SAP CR Manager (%APP_MODE%)" cmd /k set SAP_CR_MANAGER_PORT=%SAP_CR_MANAGER_PORT%^& set SAP_CR_MANAGER_DEBUG=%SAP_CR_MANAGER_DEBUG%^& py app.py
 
 for /l %%I in (1,1,30) do (
 	py -c "import sys, urllib.request; urllib.request.urlopen(r'%HEALTH_URL%', timeout=1); sys.exit(0)" >nul 2>nul

@@ -390,41 +390,39 @@ def build_view_model(
                 decorated_crs.append(decorated_cr)
                 global_crs.append(decorated_cr)
 
-            if decorated_crs:
-                kanban_columns = []
-                for status_key in KANBAN_ORDER:
-                    meta = STATUS_META[status_key]
-                    kanban_columns.append(
-                        {
-                            "key": status_key,
-                            "label": meta["label"],
-                            "tone": meta["tone"],
-                            "crs": [cr for cr in decorated_crs if cr.get("status") == status_key],
-                        }
-                    )
-
-                visible_projects += 1
-                visible_crs += len(decorated_crs)
-                client_projects.append(
+            kanban_columns = []
+            for status_key in KANBAN_ORDER:
+                meta = STATUS_META[status_key]
+                kanban_columns.append(
                     {
-                        "id": project["id"],
-                        "name": project["name"],
-                        "crs": decorated_crs,
-                        "kanban_columns": kanban_columns,
-                        "cr_count": len(project.get("crs", [])),
+                        "key": status_key,
+                        "label": meta["label"],
+                        "tone": meta["tone"],
+                        "crs": [cr for cr in decorated_crs if cr.get("status") == status_key],
                     }
                 )
 
-        if client_projects:
-            visible_clients.append(
+            visible_projects += 1
+            visible_crs += len(decorated_crs)
+            client_projects.append(
                 {
-                    "id": client["id"],
-                    "name": client["name"],
-                    "projects": client_projects,
-                    "project_count": len(client.get("projects", [])),
-                    "cr_count": sum(len(project.get("crs", [])) for project in client.get("projects", [])),
+                    "id": project["id"],
+                    "name": project["name"],
+                    "crs": decorated_crs,
+                    "kanban_columns": kanban_columns,
+                    "cr_count": len(project.get("crs", [])),
                 }
             )
+
+        visible_clients.append(
+            {
+                "id": client["id"],
+                "name": client["name"],
+                "projects": client_projects,
+                "project_count": len(client.get("projects", [])),
+                "cr_count": sum(len(project.get("crs", [])) for project in client.get("projects", [])),
+            }
+        )
 
     status_counts = count_statuses(data["clients"])
 

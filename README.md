@@ -37,7 +37,10 @@ Il launcher:
 - controlla che `py` sia disponibile
 - installa le dipendenze se necessario
 - avvia l'app locale
+- avvia sempre in modalita sviluppo (auto-reload attivo)
 - apre il browser su `http://127.0.0.1:5055`
+
+Dopo le modifiche al codice, in genere basta un refresh del browser.
 
 ## Avvio manuale
 
