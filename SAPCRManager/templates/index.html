@@ -511,8 +511,8 @@
             overflow: hidden;
             border-radius: 16px;
             border: 1px solid var(--line);
-            min-height: 72px;
-            padding: 10px 10px 10px 40px;
+              min-height: 50px;
+              padding: 5px 8px 5px 33px;
             background: #ffffff;
         }
 
@@ -537,18 +537,18 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 32px;
+                width: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             writing-mode: vertical-rl;
             transform: rotate(180deg);
             text-transform: uppercase;
-            font-size: 0.52rem;
+                font-size: 0.68rem;
             line-height: 1;
-            letter-spacing: 0.06em;
+                letter-spacing: 0.01em;
             font-weight: 800;
-            padding: 6px 0;
+                padding: 3px 0;
             user-select: none;
         }
 
@@ -568,7 +568,7 @@
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
-            gap: 8px;
+              gap: 4px;
             cursor: pointer;
             min-width: 0;
         }
@@ -578,19 +578,27 @@
             display: grid;
             grid-template-columns: max-content minmax(0, 1fr) max-content;
             align-items: center;
-            gap: 10px;
+              gap: 6px;
             overflow: hidden;
         }
 
         .cr-summary-field {
             min-width: 0;
             display: grid;
-            gap: 2px;
+                gap: 1px;
         }
+
+            .cr-item:not(.is-expanded) .cr-summary-label {
+                display: none;
+            }
+
+            .cr-item:not(.is-expanded) .cr-summary-field {
+                gap: 0;
+            }
 
         .cr-summary-label {
             margin: 0;
-            font-size: 0.68rem;
+                font-size: 0.62rem;
             line-height: 1.1;
             font-weight: 700;
             letter-spacing: 0.04em;
@@ -605,20 +613,20 @@
 
         .cr-key {
             margin: 0;
-            font-size: 0.96rem;
+                font-size: 0.88rem;
             font-weight: 800;
             color: var(--shell);
-            line-height: 1.2;
-            min-width: 64px;
+                line-height: 1.1;
+                min-width: 58px;
             flex: 0 0 auto;
         }
 
         .cr-name {
             margin: 0;
-            font-size: 0.9rem;
+                font-size: 0.82rem;
             font-weight: 700;
             color: var(--shell);
-            line-height: 1.3;
+                line-height: 1.1;
             flex: 1;
             min-width: 0;
             overflow: hidden;
@@ -626,23 +634,55 @@
             white-space: nowrap;
         }
 
+        .global-origin-band {
+            margin-top: 4px;
+            margin-left: 2px;
+            margin-right: 2px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--client-band-border, #d6e3f0);
+            background: var(--client-band-bg, #eff4f9);
+            font-size: 0.71rem;
+            line-height: 1.1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .global-origin-band .client {
+            font-weight: 800;
+            color: var(--client-band-accent, var(--shell));
+        }
+
+        .global-origin-band .sep {
+            margin: 0 4px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .global-origin-band .project {
+            font-weight: 700;
+            color: var(--muted);
+        }
+
         .cr-summary-side {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+                gap: 2px;
             min-width: 0;
             white-space: nowrap;
         }
 
         .cr-summary-side .pill {
-            padding: 5px 9px;
-            font-size: 0.76rem;
+                padding: 3px 7px;
+                font-size: 0.7rem;
         }
 
         .cr-expand-hint {
-            width: 18px;
+                width: 12px;
             text-align: center;
-            font-size: 0.9rem;
+                font-size: 0.76rem;
             color: var(--muted);
             font-weight: 700;
             white-space: nowrap;
@@ -651,13 +691,13 @@
 
         .cr-extra {
             display: none;
-            margin-top: 8px;
-            padding-top: 8px;
+                margin-top: 6px;
+                padding-top: 6px;
             border-top: 1px solid #e5e7eb;
         }
 
         .cr-item.is-expanded {
-            padding-bottom: 10px;
+                padding-bottom: 8px;
         }
 
         .cr-item.is-expanded .cr-extra {
@@ -773,23 +813,34 @@
             justify-content: center;
             text-decoration: none;
             border-radius: 999px;
-            border: 1px solid var(--line);
+            border: 1px solid var(--client-tab-border, var(--line));
             padding: 7px 12px;
             font-size: 0.86rem;
             font-weight: 700;
-            color: var(--ink);
-            background: #fff;
+            color: var(--client-tab-text, var(--ink));
+            background: var(--client-tab-bg, #fff);
         }
 
         .client-tab:hover {
-            border-color: rgba(0, 112, 242, 0.35);
-            background: #eaf3fc;
+            border-color: var(--client-tab-hover-border, rgba(0, 112, 242, 0.35));
+            background: var(--client-tab-hover-bg, #eaf3fc);
         }
 
         .client-tab.active {
-            background: var(--brand);
-            border-color: var(--brand);
-            color: #fff;
+            background: var(--client-tab-active-bg, var(--brand));
+            border-color: var(--client-tab-active-border, var(--brand));
+            color: var(--client-tab-active-text, #fff);
+        }
+
+        .client-tab-all {
+            --client-tab-bg: #fff;
+            --client-tab-border: var(--line);
+            --client-tab-text: var(--ink);
+            --client-tab-hover-bg: #eaf3fc;
+            --client-tab-hover-border: rgba(0, 112, 242, 0.35);
+            --client-tab-active-bg: var(--brand);
+            --client-tab-active-border: var(--brand);
+            --client-tab-active-text: #fff;
         }
 
         .global-card-note {
@@ -1083,9 +1134,9 @@
 
                 <section class="card client-switcher-card">
                     <div class="client-tabs">
-                        <a class="client-tab {% if filters.client_filter == 'all' %}active{% endif %}" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client='all', project='all', type=filters.type_filter) }}">Tutti i clienti</a>
-                        {% for client_name in filter_options.clients %}
-                        <a class="client-tab {% if filters.client_filter == client_name.lower() %}active{% endif %}" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client=client_name, project='all', type=filters.type_filter) }}">{{ client_name }}</a>
+                        <a class="client-tab client-tab-all {% if filters.client_filter == 'all' %}active{% endif %}" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client='all', project='all', type=filters.type_filter) }}">Tutti i clienti</a>
+                        {% for client in filter_options.clients %}
+                        <a class="client-tab {% if filters.client_filter == client.filter_value %}active{% endif %}" style="--client-tab-bg: {{ client.tab_bg }}; --client-tab-border: {{ client.tab_border }}; --client-tab-text: {{ client.tab_accent }}; --client-tab-hover-bg: {{ client.tab_bg }}; --client-tab-hover-border: {{ client.tab_border }}; --client-tab-active-bg: {{ client.tab_accent }}; --client-tab-active-border: {{ client.tab_accent }}; --client-tab-active-text: #fff;" href="{{ url_for('index', q=filters.search_text, status=filters.status_filter, client=client.name, project='all', type=filters.type_filter) }}">{{ client.name }}</a>
                         {% endfor %}
                     </div>
                 </section>
@@ -1108,7 +1159,7 @@
                                 {% if column.crs %}
                                     {% for cr in column.crs %}
                                     <article class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} cr-expandable" data-client-id="{{ cr.client_id }}" data-project-id="{{ cr.project_id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}" data-client-target="client-{{ cr.client_id }}" data-project-target="project-{{ cr.client_id }}-{{ cr.project_id }}" data-detail-target="detail-{{ cr.client_id }}-{{ cr.project_id }}-{{ cr.id }}">
-                                        <div class="cr-type-rail" aria-hidden="true">{{ cr.cr_type_label }}</div>
+                                        <div class="cr-type-rail" aria-hidden="true">{{ 'WB' if cr.cr_type == 'workbench' else 'CU' }}</div>
                                         <div class="cr-summary" data-cr-toggle>
                                             <div class="cr-summary-main">
                                                 <div class="cr-summary-field">
@@ -1125,6 +1176,7 @@
                                                 <span class="cr-expand-hint" aria-hidden="true"></span>
                                             </div>
                                         </div>
+                                        <div class="global-origin-band" style="--client-band-bg: {{ cr.client_band_bg }}; --client-band-border: {{ cr.client_band_border }}; --client-band-accent: {{ cr.client_band_accent }};"><span class="client">{{ cr.client_name }}</span><span class="sep">/</span><span class="project">{{ cr.project_name }}</span></div>
                                         <div class="cr-extra">
                                             <div class="cr-meta">
                                                 <span>{{ cr.client_name }}</span>
@@ -1269,7 +1321,7 @@
                                             {% if column.crs %}
                                                 {% for cr in column.crs %}
                                                 <article id="detail-{{ client.id }}-{{ project.id }}-{{ cr.id }}" class="cr-item status-{{ cr.tone }} type-{{ cr.cr_type }} kanban-draggable cr-expandable" draggable="true" data-client-id="{{ client.id }}" data-project-id="{{ project.id }}" data-cr-id="{{ cr.id }}" data-current-status="{{ cr.status }}">
-                                                    <div class="cr-type-rail" aria-hidden="true">{{ cr.cr_type_label }}</div>
+                                                    <div class="cr-type-rail" aria-hidden="true">{{ 'WB' if cr.cr_type == 'workbench' else 'CU' }}</div>
                                                     <div class="cr-summary" data-cr-toggle>
                                                         <div class="cr-summary-main">
                                                             <div class="cr-summary-field">

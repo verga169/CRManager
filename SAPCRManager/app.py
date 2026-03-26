@@ -62,17 +62,29 @@ def sanitize_text(raw_value: str) -> str:
     return (raw_value or "").strip()
 
 
-def build_project_export_filename(project_name: str, extension: str) -> str:
-    normalized_project_name = sanitize_text(project_name).lower()
-    safe_project_name = "".join(
-        character if character.isalnum() else "_"
-        for character in normalized_project_name
-    ).strip("_") or "progetto"
-    while "__" in safe_project_name:
-        safe_project_name = safe_project_name.replace("__", "_")
+def _to_camel_case(raw_value: str) -> str:
+    tokens: list[str] = []
+    current_token: list[str] = []
+    for character in sanitize_text(raw_value):
+        if character.isalnum():
+            current_token.append(character)
+            continue
+        if current_token:
+            tokens.append("".join(current_token))
+            current_token = []
+    if current_token:
+        tokens.append("".join(current_token))
 
+    if not tokens:
+        return "Progetto"
+
+    return "".join(token[:1].upper() + token[1:] for token in tokens)
+
+
+def build_project_export_filename(project_name: str, extension: str) -> str:
+    safe_project_name = _to_camel_case(project_name)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"sap_cr_progetto_{safe_project_name}_{timestamp}.{extension}"
+    return f"ListaCR_{safe_project_name}_{timestamp}.{extension}"
 
 
 def new_id() -> str:
@@ -98,6 +110,17 @@ def format_it_datetime(iso_str: str) -> str:
 def now_it_datetime() -> str:
     dt = datetime.now()
     return f"{dt.day:02d} {_IT_MONTHS[dt.month - 1]} {dt.year} {dt.hour:02d}:{dt.minute:02d}"
+
+
+def build_client_band_palette(client_name: str) -> dict:
+    normalized_name = sanitize_text(client_name).lower() or "client"
+    seed = sum((index + 1) * ord(char) for index, char in enumerate(normalized_name))
+    hue = seed % 360
+    return {
+        "bg": f"hsl({hue} 72% 93%)",
+        "border": f"hsl({hue} 48% 78%)",
+        "accent": f"hsl({hue} 58% 34%)",
+    }
 
 
 def ensure_data_file() -> None:
@@ -262,10 +285,27 @@ def normalize_filter_value(raw_value: str) -> str:
 
 
 def build_filter_options(data: dict) -> dict:
-    client_names = sorted(
-        {sanitize_text(client.get("name")) for client in data["clients"] if sanitize_text(client.get("name"))},
-        key=str.lower,
-    )
+    unique_clients: dict[str, str] = {}
+    for client in data["clients"]:
+        client_name = sanitize_text(client.get("name"))
+        if not client_name:
+            continue
+        unique_clients.setdefault(client_name.lower(), client_name)
+
+    client_names = sorted(unique_clients.values(), key=str.lower)
+    client_filters = []
+    for client_name in client_names:
+        palette = build_client_band_palette(client_name)
+        client_filters.append(
+            {
+                "name": client_name,
+                "filter_value": client_name.lower(),
+                "tab_bg": palette["bg"],
+                "tab_border": palette["border"],
+                "tab_accent": palette["accent"],
+            }
+        )
+
     project_names = sorted(
         {
             sanitize_text(project.get("name"))
@@ -276,7 +316,7 @@ def build_filter_options(data: dict) -> dict:
         key=str.lower,
     )
     return {
-        "clients": client_names,
+        "clients": client_filters,
         "projects": project_names,
         "cr_types": [CR_TYPE_META["workbench"]["label"], CR_TYPE_META["customizing"]["label"]],
     }
@@ -662,6 +702,10 @@ def build_view_model(
                 decorated_cr["project_id"] = project["id"]
                 decorated_cr["created_at"] = format_it_datetime(cr.get("created_at", ""))
                 decorated_cr["updated_at"] = format_it_datetime(cr.get("updated_at", ""))
+                client_palette = build_client_band_palette(client_name)
+                decorated_cr["client_band_bg"] = client_palette["bg"]
+                decorated_cr["client_band_border"] = client_palette["border"]
+                decorated_cr["client_band_accent"] = client_palette["accent"]
                 decorated_crs.append(decorated_cr)
                 global_crs.append(decorated_cr)
 
@@ -700,7 +744,10 @@ def build_view_model(
             }
         )
 
-    status_counts = count_statuses(data["clients"])
+    status_counts = {key: 0 for key in STATUS_META}
+    for cr in global_crs:
+        status = normalize_status(cr.get("status"))
+        status_counts[status] += 1
 
     return {
         "clients": visible_clients,
@@ -754,11 +801,11 @@ def export_excel():
         project_filter=project_filter,
         type_filter=type_filter,
     )
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    export_project_name = project_filter if sanitize_text(project_filter).lower() != "all" else "TuttiProgetti"
     return send_file(
         workbook_stream,
         as_attachment=True,
-        download_name=f"sap_cr_list_{timestamp}.xlsx",
+        download_name=build_project_export_filename(export_project_name, "xlsx"),
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
