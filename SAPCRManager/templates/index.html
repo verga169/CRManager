@@ -6,25 +6,25 @@
     <title>SAP CR Manager</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #eff4f9;
+            --bg: #f3f5f8;
             --card: #ffffff;
-            --ink: #1f2d3d;
-            --muted: #5b738b;
-            --line: #d9e2ec;
-            --brand: #0a6ed1;
-            --brand-dark: #0854a0;
-            --brand-soft: #eaf3fc;
-            --quality: #e78c07;
-            --quality-soft: #fff4d6;
-            --production: #bb0000;
-            --production-soft: #ffe5e5;
-            --development: #107e3e;
-            --development-soft: #ebf8ef;
-            --shell: #354a5f;
-            --shadow: 0 12px 30px rgba(20, 36, 31, 0.10);
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #dde4ee;
+            --brand: #1f3a5f;
+            --brand-dark: #162b47;
+            --brand-soft: #eef2f7;
+            --quality: #b7791f;
+            --quality-soft: #fdf4e7;
+            --production: #b42318;
+            --production-soft: #fef1f1;
+            --development: #1f7a43;
+            --development-soft: #edf7f1;
+            --shell: #374151;
+            --shadow: 0 8px 22px rgba(17, 24, 39, 0.06);
         }
 
         * { box-sizing: border-box; }
@@ -39,10 +39,10 @@
             margin: 0;
             color: var(--ink);
             background:
-                radial-gradient(circle at 12% 8%, rgba(10, 110, 209, 0.05) 0%, transparent 42%),
-                radial-gradient(circle at 88% 16%, rgba(53, 74, 95, 0.04) 0%, transparent 34%),
-                linear-gradient(180deg, #f7f9fb 0%, #eff4f9 52%, #edf2f7 100%);
-            font-family: "DM Sans", sans-serif;
+                radial-gradient(circle at 8% 6%, rgba(31, 58, 95, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 88% 12%, rgba(31, 41, 55, 0.03) 0%, transparent 36%),
+                linear-gradient(180deg, #f8fafc 0%, #f3f5f8 55%, #f1f4f8 100%);
+            font-family: "Manrope", sans-serif;
         }
 
         .page {
@@ -66,9 +66,10 @@
         }
 
         .hero {
-            background: var(--brand);
-            border-radius: 24px;
-            color: #f4fffc;
+            background: linear-gradient(135deg, #1b2d45 0%, #243b5b 100%);
+            border: 1px solid #2e4769;
+            border-radius: 14px;
+            color: #f3f6fb;
             padding: 28px;
             box-shadow: var(--shadow);
             margin-bottom: 18px;
@@ -76,9 +77,9 @@
 
         .hero h1 {
             margin: 0;
-            font-family: "Syne", sans-serif;
+            font-family: "Sora", sans-serif;
             font-size: clamp(2rem, 5vw, 3rem);
-            letter-spacing: 0.02em;
+            letter-spacing: 0.01em;
         }
 
         .hero p {
@@ -116,7 +117,7 @@
         .metric {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 14px;
             box-shadow: var(--shadow);
         }
@@ -171,7 +172,7 @@
         .card {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 18px;
+            border-radius: 12px;
             box-shadow: var(--shadow);
             padding: 16px;
         }
@@ -179,7 +180,7 @@
         .card h2,
         .card h3 {
             margin: 0 0 12px;
-            font-family: "Syne", sans-serif;
+            font-family: "Sora", sans-serif;
         }
 
         .card h2 { font-size: 1.25rem; }
@@ -231,7 +232,7 @@
         select {
             width: 100%;
             border: 1px solid var(--line);
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 11px 12px;
             font: inherit;
             color: var(--ink);
@@ -253,10 +254,10 @@
 
         .btn {
             border: 0;
-            border-radius: 12px;
-            padding: 11px 14px;
+            border-radius: 10px;
+            padding: 10px 14px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             cursor: pointer;
             text-decoration: none;
             white-space: nowrap;
@@ -265,9 +266,36 @@
         .btn-brand { background: var(--brand); color: #fff; }
         .btn-brand:hover { background: var(--brand-dark); }
         .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
-        .btn-danger { background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca; }
-        .btn-export { background: #eaf3fc; color: #0a6ed1; border: 1px solid #b7cee8; }
-        .btn-pdf { background: #f7f9fb; color: var(--brand-dark); border: 1px solid #c9d7e6; }
+        .btn-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .btn-export { background: #f8fafc; color: #1f3a5f; border: 1px solid #cfd8e3; }
+        .btn-pdf { background: #f8fafc; color: #1f3a5f; border: 1px solid #cfd8e3; }
+
+        .btn-icon {
+            width: 54px;
+            height: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
 
         .flash-list {
             display: grid;
@@ -298,29 +326,29 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border-radius: 999px;
-            padding: 7px 11px;
-            font-size: 0.82rem;
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 0.78rem;
             font-weight: 700;
             border: 1px solid transparent;
         }
 
         .pill-development {
-            background: var(--development-soft);
-            color: var(--development);
-            border-color: #b7dec2;
+            background: #edf8f1;
+            color: #1f7a43;
+            border-color: #b8d8c2;
         }
 
         .pill-quality {
-            background: var(--quality-soft);
-            color: var(--quality);
-            border-color: #f3d18c;
+            background: #fdf3e3;
+            color: #a06d22;
+            border-color: #e9d2ac;
         }
 
         .pill-production {
-            background: var(--production-soft);
-            color: var(--production);
-            border-color: #f0b6b6;
+            background: #fdf0f0;
+            color: #a84343;
+            border-color: #ebc2c2;
         }
 
         .client-list {
@@ -349,16 +377,16 @@
         .project-card {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 18px;
+            border-radius: 12px;
             box-shadow: var(--shadow);
             padding: 16px;
         }
 
         .project-card {
-            border: 2px solid #d6e3f0;
-            border-left: 8px solid hsl(var(--project-accent-h, 210) 74% 45%);
+            border: 1px solid #d6deea;
+            border-left: 4px solid hsl(var(--project-accent-h, 210) 58% 42%);
             background:
-                linear-gradient(180deg, hsl(var(--project-accent-h, 210) 85% 98%) 0%, #ffffff 42%),
+                linear-gradient(180deg, hsl(var(--project-accent-h, 210) 42% 97%) 0%, #ffffff 46%),
                 #ffffff;
         }
 
@@ -398,10 +426,10 @@
         }
 
         .project-head {
-            border: 1px solid hsl(var(--project-accent-h, 210) 52% 84%);
-            border-radius: 12px;
+            border: 1px solid hsl(var(--project-accent-h, 210) 34% 84%);
+            border-radius: 10px;
             padding: 10px 12px;
-            background: hsl(var(--project-accent-h, 210) 78% 96%);
+            background: hsl(var(--project-accent-h, 210) 36% 95%);
             margin-bottom: 8px;
         }
 
@@ -415,15 +443,15 @@
         .project-chip {
             display: inline-flex;
             align-items: center;
-            border-radius: 999px;
+            border-radius: 8px;
             padding: 4px 10px;
             font-size: 0.72rem;
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: hsl(var(--project-accent-h, 210) 66% 30%);
-            border: 1px solid hsl(var(--project-accent-h, 210) 48% 78%);
-            background: hsl(var(--project-accent-h, 210) 78% 94%);
+            color: hsl(var(--project-accent-h, 210) 44% 30%);
+            border: 1px solid hsl(var(--project-accent-h, 210) 30% 78%);
+            background: hsl(var(--project-accent-h, 210) 30% 93%);
             width: fit-content;
         }
 
@@ -437,6 +465,68 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .project-title-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 2px;
+        }
+
+        .project-rename-icon-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #c7d3e3;
+            background: #ffffff;
+            color: #4b5563;
+            border-radius: 10px;
+            padding: 0;
+            line-height: 1;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .project-rename-icon-btn svg,
+        .project-delete-icon-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .project-rename-icon-btn:hover {
+            background: #edf2f7;
+            border-color: #b4c4d8;
+            color: #374151;
+        }
+
+        .project-delete-icon-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #c7d3e3;
+            background: #ffffff;
+            color: #4b5563;
+            border-radius: 10px;
+            padding: 0;
+            line-height: 1;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .project-delete-icon-btn:hover {
+            background: #edf2f7;
+            border-color: #b4c4d8;
+            color: #374151;
         }
 
         .client-title h2,
@@ -482,17 +572,17 @@
             gap: 8px;
             text-decoration: none;
             border: 1px solid hsl(var(--chip-h, 210) 52% 82%);
-            background: hsl(var(--chip-h, 210) 90% 96%);
-            color: hsl(var(--chip-h, 210) 70% 30%);
-            border-radius: 999px;
+            background: hsl(var(--chip-h, 210) 34% 95%);
+            color: hsl(var(--chip-h, 210) 46% 30%);
+            border-radius: 10px;
             padding: 6px 11px;
             font-size: 0.78rem;
             font-weight: 700;
         }
 
         .project-map-chip:hover {
-            background: hsl(var(--chip-h, 210) 94% 92%);
-            border-color: hsl(var(--chip-h, 210) 56% 74%);
+            background: hsl(var(--chip-h, 210) 38% 92%);
+            border-color: hsl(var(--chip-h, 210) 38% 74%);
         }
 
         .project-map-chip .name {
@@ -559,7 +649,7 @@
 
         .kanban-column {
             border: 1px solid var(--line);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 12px;
             background: #ffffff;
             min-height: 180px;
@@ -610,7 +700,7 @@
         .cr-item {
             position: relative;
             overflow: hidden;
-            border-radius: 16px;
+                        border-radius: 10px;
             border: 1px solid var(--line);
               min-height: 50px;
               padding: 5px 8px 5px 33px;
@@ -859,6 +949,13 @@
             font-weight: 700;
         }
 
+        .project-content-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
         .project-toggle {
             width: 30px;
             height: 30px;
@@ -920,7 +1017,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border-radius: 999px;
+            border-radius: 10px;
             border: 1px solid #d6e3f0;
             background: #f6f9fc;
             color: var(--muted);
@@ -936,25 +1033,70 @@
         }
 
         .project-status-pill.status-development {
-            border-color: #b7dec2;
-            background: var(--development-soft);
-            color: var(--development);
+            border-color: #b8d8c2;
+            background: #edf8f1;
+            color: #1f7a43;
         }
 
         .project-status-pill.status-quality {
-            border-color: #f3d18c;
-            background: var(--quality-soft);
-            color: var(--quality);
+            border-color: #e9d2ac;
+            background: #fdf3e3;
+            color: #a06d22;
         }
 
         .project-status-pill.status-production {
-            border-color: #f0b6b6;
-            background: var(--production-soft);
-            color: var(--production);
+            border-color: #ebc2c2;
+            background: #fdf0f0;
+            color: #a84343;
         }
 
         .global-board-card {
             margin-bottom: 16px;
+        }
+
+        .global-board-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .global-board-header h2 {
+            margin: 0;
+        }
+
+        .global-board-toggle {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #c9d4e2;
+            background: #ffffff;
+            color: var(--brand-dark);
+            border-radius: 10px;
+            padding: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .global-board-toggle:hover {
+            background: #eef2f7;
+        }
+
+        .global-board-toggle::before {
+            content: '▾';
+        }
+
+        .global-board-card.is-collapsed .global-board-toggle::before {
+            content: '▸';
+        }
+
+        .global-board-card.is-collapsed .global-board-content {
+            display: none;
         }
 
         .global-board-card .kanban-column-body {
@@ -983,7 +1125,7 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            border-radius: 999px;
+            border-radius: 10px;
             border: 1px solid var(--client-tab-border, var(--line));
             padding: 7px 12px;
             font-size: 0.86rem;
@@ -1053,19 +1195,19 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            border: 1px dashed rgba(0, 112, 242, 0.35);
-            border-radius: 14px;
-            background: var(--brand-soft);
+            border: 1px solid #d3dbe6;
+            border-radius: 10px;
+            background: #f8fafc;
             color: var(--brand-dark);
             padding: 10px 14px;
             font: inherit;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
         }
 
         .quick-create-trigger:hover {
-            border-color: rgba(0, 112, 242, 0.55);
-            background: #eaf3fc;
+            border-color: #b8c6d9;
+            background: #eef2f7;
         }
 
         .quick-create-trigger.project-trigger {
@@ -1080,7 +1222,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 999px;
+            border-radius: 8px;
             background: var(--brand);
             color: #fff;
             font-size: 1.1rem;
@@ -1089,10 +1231,10 @@
 
         .dialog {
             width: min(460px, calc(100vw - 24px));
-            border: 0;
-            border-radius: 20px;
+            border: 1px solid #d8e0ea;
+            border-radius: 12px;
             padding: 0;
-            box-shadow: 0 24px 60px rgba(20, 36, 31, 0.22);
+            box-shadow: 0 18px 40px rgba(17, 24, 39, 0.14);
             overflow: hidden;
         }
 
@@ -1244,6 +1386,12 @@
                 grid-template-columns: 1fr;
             }
 
+            .project-content-actions .btn {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
             .client-project-map {
                 margin-top: 8px;
                 padding-top: 8px;
@@ -1340,8 +1488,12 @@
             </section>
 
             <section class="main-content-stack">
-                <section class="card global-board-card">
-                    <h2>Board globale</h2>
+                <section class="card global-board-card is-collapsed">
+                    <div class="global-board-header">
+                        <h2>Board globale</h2>
+                        <button class="global-board-toggle" type="button" data-global-board-toggle aria-expanded="false" aria-label="Espandi board globale" title="Espandi board globale"></button>
+                    </div>
+                    <div class="global-board-content">
                     <div class="kanban-board">
                         {% for column in global_kanban_columns %}
                         <section class="kanban-column" data-status="{{ column.key }}" data-board-scope="global">
@@ -1393,6 +1545,7 @@
                             </div>
                         </section>
                         {% endfor %}
+                    </div>
                     </div>
                 </section>
 
@@ -1448,6 +1601,32 @@
                                         <div class="project-title-row">
                                             <button class="project-toggle" type="button" data-project-toggle="project-{{ client.id }}-{{ project.id }}" aria-expanded="false" aria-label="Espandi progetto" title="Espandi progetto"></button>
                                             <h3>{{ project.name }}</h3>
+                                            <span class="project-title-actions">
+                                                <button
+                                                    class="project-rename-icon-btn"
+                                                    type="button"
+                                                    data-open-project-rename
+                                                    data-project-action="{{ url_for('update_project', client_id=client.id, project_id=project.id) }}"
+                                                    data-client-name="{{ client.name }}"
+                                                    data-project-name="{{ project.name }}"
+                                                    aria-label="Rinomina progetto"
+                                                    title="Rinomina progetto"
+                                                >
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                        <path d="M4 20h4l10-10-4-4L4 16v4z"></path>
+                                                        <path d="M12 6l4 4"></path>
+                                                    </svg>
+                                                </button>
+                                                <form method="post" action="{{ url_for('delete_project', client_id=client.id, project_id=project.id) }}" onsubmit="return confirm('Eliminare il progetto e tutte le CR associate?');" style="display:inline-flex; margin:0;">
+                                                    <button class="project-delete-icon-btn" type="submit" aria-label="Elimina progetto" title="Elimina progetto">
+                                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                            <path d="M4 7h16"></path>
+                                                            <path d="M9 7V5h6v2"></path>
+                                                            <path d="M8 7l1 12h6l1-12"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </span>
                                         </div>
                                         <div class="meta-row">
                                             <span class="pill pill-development">{{ project.cr_count }} CR nel progetto</span>
@@ -1459,70 +1638,48 @@
                                         </div>
                                     </div>
                                     <div class="project-tools">
-                                        <a class="btn btn-export" href="{{ url_for('export_project_excel', client_id=client.id, project_id=project.id) }}">Export Excel</a>
-                                        <a class="btn btn-pdf" href="{{ url_for('export_project_pdf', client_id=client.id, project_id=project.id) }}">Export PDF</a>
-                                        <form method="post" action="{{ url_for('delete_project', client_id=client.id, project_id=project.id) }}" onsubmit="return confirm('Eliminare il progetto e tutte le CR associate?');">
-                                            <button class="btn btn-light" type="submit">Elimina progetto</button>
-                                        </form>
+                                        <a class="btn btn-export btn-icon" href="{{ url_for('export_project_excel', client_id=client.id, project_id=project.id) }}" title="Export Excel" aria-label="Export Excel">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+                                                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                                            </svg>
+                                            <span class="sr-only">Export Excel</span>
+                                        </a>
+                                        <a class="btn btn-pdf btn-icon" href="{{ url_for('export_project_pdf', client_id=client.id, project_id=project.id) }}" title="Export PDF" aria-label="Export PDF">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+                                                <path d="M8 9h8M8 12h8M8 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                                            </svg>
+                                            <span class="sr-only">Export PDF</span>
+                                        </a>
                                     </div>
                                 </div>
 
                                 <div class="project-content">
 
-                                <form method="post" action="{{ url_for('add_cr', client_id=client.id, project_id=project.id) }}" class="compact-form">
-                                    <p class="project-cr-section-title">Nuova CR per il progetto {{ project.name }}</p>
-                                    <div class="fields-cr">
-                                        <label>
-                                            Ordine
-                                            <input type="number" min="{{ project.next_release_order }}" name="release_order" value="{{ project.next_release_order }}" required>
-                                        </label>
-                                        <label>
-                                            Tipo CR
-                                            <select name="cr_type">
-                                                <option value="workbench">Workbench</option>
-                                                <option value="customizing">Customizing</option>
-                                            </select>
-                                        </label>
-                                        <label>
-                                            Richiesta
-                                            <input type="text" name="cr_key" placeholder="Nuova richiesta" required>
-                                        </label>
-                                        <label>
-                                            Creata da
-                                            <input type="text" name="created_by" placeholder="Creato da" required>
-                                        </label>
-                                        <label>
-                                            Descrizione
-                                            <input type="text" name="description" placeholder="Descrizione" required>
-                                        </label>
-                                    </div>
-                                    <div class="fields-1">
-                                        <label>
-                                            Note operative
-                                            <textarea name="notes" placeholder="Note"></textarea>
-                                        </label>
-                                    </div>
-                                    <div class="form-actions">
-                                        <button
-                                            class="btn btn-light"
-                                            type="button"
-                                            data-open-clipboard-import
-                                            data-client-id="{{ client.id }}"
-                                            data-project-id="{{ project.id }}"
-                                            data-project-name="{{ project.name }}"
-                                            data-next-release-order="{{ project.next_release_order }}"
-                                        >
-                                            Incolla da clipboard
-                                        </button>
-                                        <button class="btn btn-brand" type="submit">Aggiungi CR</button>
-                                    </div>
-                                </form>
-
-                                <div class="cr-legend" aria-label="Struttura card CR progetto {{ project.name }}">
-                                    <span class="cr-legend-item"><span class="cr-legend-rail">WB</span> Workbench</span>
-                                    <span class="cr-legend-item"><span class="cr-legend-rail cu">CU</span> Customizing</span>
-                                    <span class="cr-legend-item">Richiesta + Descrizione</span>
-                                    <span class="cr-legend-item">Drag and drop stato</span>
+                                <div class="compact-form project-content-actions">
+                                    <button
+                                        class="btn btn-brand"
+                                        type="button"
+                                        data-open-cr-dialog
+                                        data-cr-action="{{ url_for('add_cr', client_id=client.id, project_id=project.id) }}"
+                                        data-client-name="{{ client.name }}"
+                                        data-project-name="{{ project.name }}"
+                                        data-next-release-order="{{ project.next_release_order }}"
+                                    >
+                                        Nuova CR
+                                    </button>
+                                    <button
+                                        class="btn btn-light"
+                                        type="button"
+                                        data-open-clipboard-import
+                                        data-client-id="{{ client.id }}"
+                                        data-project-id="{{ project.id }}"
+                                        data-project-name="{{ project.name }}"
+                                        data-next-release-order="{{ project.next_release_order }}"
+                                    >
+                                        Incolla da clipboard
+                                    </button>
                                 </div>
 
                                 <div class="kanban-board">
@@ -1653,7 +1810,7 @@
                 <form method="post" action="#" class="fields-1" id="project-create-form">
                     <input type="text" name="project_name" id="project-name-input" placeholder="Nuovo Progetto" aria-label="Nuovo Progetto" required>
                     <div class="form-actions">
-                        <button class="btn btn-brand" type="submit">Salva</button>
+                        <button class="btn btn-brand" type="submit" id="project-dialog-submit">Salva</button>
                         <button class="btn btn-light" type="button" id="cancel-project-dialog">Annulla</button>
                     </div>
                 </form>
@@ -1715,6 +1872,55 @@
                 </div>
             </div>
         </dialog>
+
+        <dialog id="cr-create-dialog" class="dialog dialog-wide">
+            <div class="dialog-shell">
+                <div class="dialog-head">
+                    <h2 id="cr-dialog-title">Nuova CR</h2>
+                    <p id="cr-dialog-description">Compila i campi della nuova Change Request.</p>
+                </div>
+
+                <form method="post" action="#" class="fields-1" id="cr-create-form">
+                    <div class="fields-cr">
+                        <label>
+                            Ordine
+                            <input type="number" name="release_order" id="cr-release-order-input" min="1" value="1" required>
+                        </label>
+                        <label>
+                            Tipo CR
+                            <select name="cr_type" id="cr-type-input">
+                                <option value="workbench">Workbench</option>
+                                <option value="customizing">Customizing</option>
+                            </select>
+                        </label>
+                        <label>
+                            Richiesta
+                            <input type="text" name="cr_key" id="cr-key-input" placeholder="Nuova richiesta" required>
+                        </label>
+                        <label>
+                            Creata da
+                            <input type="text" name="created_by" id="cr-created-by-input" placeholder="Creato da" required>
+                        </label>
+                        <label>
+                            Descrizione
+                            <input type="text" name="description" id="cr-description-input" placeholder="Descrizione" required>
+                        </label>
+                    </div>
+
+                    <div class="fields-1">
+                        <label>
+                            Note operative
+                            <textarea name="notes" id="cr-notes-input" placeholder="Note"></textarea>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-brand" type="submit">Aggiungi CR</button>
+                        <button class="btn btn-light" type="button" id="cancel-cr-dialog">Annulla</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
     </main>
     <script>
         (() => {
@@ -1724,6 +1930,8 @@
             const projectHeads = document.querySelectorAll('.project-head');
             const crToggleAreas = document.querySelectorAll('[data-cr-toggle]');
             const openDetailButtons = document.querySelectorAll('[data-open-detail]');
+            const globalBoardCard = document.querySelector('.global-board-card');
+            const globalBoardToggle = document.querySelector('[data-global-board-toggle]');
             const openClientDialogButton = document.getElementById('open-client-dialog');
             const clientCreateDialog = document.getElementById('client-create-dialog');
             const cancelClientDialogButton = document.getElementById('cancel-client-dialog');
@@ -1735,7 +1943,21 @@
             const projectDialogTitle = document.getElementById('project-dialog-title');
             const projectDialogDescription = document.getElementById('project-dialog-description');
             const projectNameInput = document.getElementById('project-name-input');
+            const projectDialogSubmitButton = document.getElementById('project-dialog-submit');
+            const openProjectRenameButtons = document.querySelectorAll('[data-open-project-rename]');
+            const openCrDialogButtons = document.querySelectorAll('[data-open-cr-dialog]');
             const openClipboardImportButtons = document.querySelectorAll('[data-open-clipboard-import]');
+            const crCreateDialog = document.getElementById('cr-create-dialog');
+            const crCreateForm = document.getElementById('cr-create-form');
+            const crDialogTitle = document.getElementById('cr-dialog-title');
+            const crDialogDescription = document.getElementById('cr-dialog-description');
+            const crReleaseOrderInput = document.getElementById('cr-release-order-input');
+            const crTypeInput = document.getElementById('cr-type-input');
+            const crKeyInput = document.getElementById('cr-key-input');
+            const crCreatedByInput = document.getElementById('cr-created-by-input');
+            const crDescriptionInput = document.getElementById('cr-description-input');
+            const crNotesInput = document.getElementById('cr-notes-input');
+            const cancelCrDialogButton = document.getElementById('cancel-cr-dialog');
             const clipboardImportDialog = document.getElementById('clipboard-import-dialog');
             const clipboardImportTarget = document.getElementById('clipboard-import-target');
             const clipboardImportText = document.getElementById('clipboard-import-text');
@@ -1797,6 +2019,20 @@
                     const label = collapsed ? 'Espandi progetto' : 'Comprimi progetto';
                     toggle.setAttribute('aria-label', label);
                     toggle.setAttribute('title', label);
+                }
+            };
+
+            const setGlobalBoardCollapsed = (collapsed) => {
+                if (!globalBoardCard) {
+                    return;
+                }
+
+                globalBoardCard.classList.toggle('is-collapsed', collapsed);
+                if (globalBoardToggle) {
+                    globalBoardToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                    const label = collapsed ? 'Espandi board globale' : 'Comprimi board globale';
+                    globalBoardToggle.setAttribute('aria-label', label);
+                    globalBoardToggle.setAttribute('title', label);
                 }
             };
 
@@ -1959,6 +2195,7 @@
                     reason,
                     savedAt: Date.now(),
                     scrollY: window.scrollY || 0,
+                    isGlobalBoardExpanded: globalBoardCard ? !globalBoardCard.classList.contains('is-collapsed') : false,
                     openClientIds: Array.from(document.querySelectorAll('.client-card[open]')).map((item) => item.id).filter(Boolean),
                     expandedProjectIds: Array.from(document.querySelectorAll('.project-card:not(.is-collapsed)')).map((item) => item.id).filter(Boolean),
                     expandedCrKeys: Array.from(document.querySelectorAll('.cr-expandable.is-expanded'))
@@ -1991,6 +2228,7 @@
             };
 
             const applyHomeView = () => {
+                setGlobalBoardCollapsed(true);
                 document.querySelectorAll('.project-card').forEach((projectCard) => {
                     setProjectCollapsed(projectCard, true);
                 });
@@ -2001,9 +2239,12 @@
             };
 
             const applyRestoreView = (state) => {
+                const isGlobalBoardExpanded = state.isGlobalBoardExpanded === true;
                 const openClientIds = new Set(Array.isArray(state.openClientIds) ? state.openClientIds : []);
                 const expandedProjectIds = new Set(Array.isArray(state.expandedProjectIds) ? state.expandedProjectIds : []);
                 const expandedCrKeys = new Set(Array.isArray(state.expandedCrKeys) ? state.expandedCrKeys : []);
+
+                setGlobalBoardCollapsed(!isGlobalBoardExpanded);
 
                 document.querySelectorAll('.client-card').forEach((clientCard) => {
                     if (!clientCard.id) {
@@ -2038,9 +2279,17 @@
                 clearAutoRestoreState();
             } else {
                 clearAutoRestoreState();
+                setGlobalBoardCollapsed(true);
                 if (navigationType === 'reload') {
                     applyHomeView();
                 }
+            }
+
+            if (globalBoardToggle) {
+                globalBoardToggle.addEventListener('click', () => {
+                    const isCollapsed = globalBoardCard?.classList.contains('is-collapsed');
+                    setGlobalBoardCollapsed(!isCollapsed);
+                });
             }
 
             const highlightDetailCard = (targetId) => {
@@ -2201,12 +2450,112 @@
                     projectCreateForm.action = action;
                     projectDialogTitle.textContent = 'Nuovo Progetto';
                     projectDialogDescription.textContent = `Inserisci il nome del progetto per ${clientName} e conferma il salvataggio.`;
+                    if (projectDialogSubmitButton) {
+                        projectDialogSubmitButton.textContent = 'Salva';
+                    }
+                    if (projectNameInput) {
+                        projectNameInput.value = '';
+                        projectNameInput.placeholder = 'Nuovo Progetto';
+                        projectNameInput.setAttribute('aria-label', 'Nuovo Progetto');
+                    }
                     projectCreateDialog.showModal();
                     window.setTimeout(() => {
                         projectNameInput?.focus();
                     }, 0);
                 });
             });
+
+            openProjectRenameButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (!projectCreateDialog || !projectCreateForm) {
+                        return;
+                    }
+
+                    const clientName = button.dataset.clientName || 'cliente selezionato';
+                    const currentProjectName = button.dataset.projectName || '';
+                    const action = button.dataset.projectAction || '#';
+
+                    projectCreateForm.action = action;
+                    projectDialogTitle.textContent = 'Rinomina Progetto';
+                    projectDialogDescription.textContent = `Aggiorna il nome del progetto per ${clientName}.`;
+                    if (projectDialogSubmitButton) {
+                        projectDialogSubmitButton.textContent = 'Aggiorna nome';
+                    }
+                    if (projectNameInput) {
+                        projectNameInput.value = currentProjectName;
+                        projectNameInput.placeholder = 'Nome Progetto';
+                        projectNameInput.setAttribute('aria-label', 'Nome Progetto');
+                    }
+
+                    projectCreateDialog.showModal();
+                    window.setTimeout(() => {
+                        projectNameInput?.focus();
+                        projectNameInput?.select();
+                    }, 0);
+                });
+            });
+
+            openCrDialogButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (!crCreateDialog || !crCreateForm) {
+                        return;
+                    }
+
+                    const clientName = button.dataset.clientName || 'cliente selezionato';
+                    const projectName = button.dataset.projectName || 'progetto selezionato';
+                    const action = button.dataset.crAction || '#';
+                    const nextReleaseOrder = Number.parseInt(button.dataset.nextReleaseOrder || '1', 10) || 1;
+
+                    crCreateForm.action = action;
+                    crDialogTitle.textContent = 'Nuova CR';
+                    crDialogDescription.textContent = `Nuova CR per ${clientName} / ${projectName}.`;
+                    if (crReleaseOrderInput) {
+                        crReleaseOrderInput.min = String(nextReleaseOrder);
+                        crReleaseOrderInput.value = String(nextReleaseOrder);
+                    }
+                    if (crTypeInput) {
+                        crTypeInput.value = 'workbench';
+                    }
+                    if (crKeyInput) {
+                        crKeyInput.value = '';
+                    }
+                    if (crCreatedByInput) {
+                        crCreatedByInput.value = '';
+                    }
+                    if (crDescriptionInput) {
+                        crDescriptionInput.value = '';
+                    }
+                    if (crNotesInput) {
+                        crNotesInput.value = '';
+                    }
+
+                    crCreateDialog.showModal();
+                    window.setTimeout(() => {
+                        crKeyInput?.focus();
+                    }, 0);
+                });
+            });
+
+            if (cancelCrDialogButton && crCreateDialog) {
+                cancelCrDialogButton.addEventListener('click', () => {
+                    crCreateDialog.close();
+                });
+            }
+
+            if (crCreateDialog) {
+                crCreateDialog.addEventListener('click', (event) => {
+                    const dialogBounds = crCreateDialog.getBoundingClientRect();
+                    const isInDialog =
+                        dialogBounds.top <= event.clientY &&
+                        event.clientY <= dialogBounds.top + dialogBounds.height &&
+                        dialogBounds.left <= event.clientX &&
+                        event.clientX <= dialogBounds.left + dialogBounds.width;
+
+                    if (!isInDialog) {
+                        crCreateDialog.close();
+                    }
+                });
+            }
 
             openClipboardImportButtons.forEach((button) => {
                 button.addEventListener('click', () => {

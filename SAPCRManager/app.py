@@ -968,6 +968,37 @@ def delete_project(client_id: str, project_id: str):
     return redirect(url_for("index"))
 
 
+@app.post("/clients/<client_id>/projects/<project_id>/update")
+def update_project(client_id: str, project_id: str):
+    project_name = sanitize_text(request.form.get("project_name"))
+    if not project_name:
+        flash("Inserisci il nome del progetto.", "error")
+        return redirect(url_for("index"))
+
+    data = load_data()
+    client = find_client(data, client_id)
+    if client is None:
+        flash("Cliente non trovato.", "error")
+        return redirect(url_for("index"))
+
+    project = find_project(client, project_id)
+    if project is None:
+        flash("Progetto non trovato.", "error")
+        return redirect(url_for("index"))
+
+    if any(
+        item.get("id") != project_id and item.get("name", "").lower() == project_name.lower()
+        for item in client.get("projects", [])
+    ):
+        flash("Esiste gia un progetto con questo nome per il cliente selezionato.", "error")
+        return redirect(url_for("index"))
+
+    project["name"] = project_name
+    save_data(data)
+    flash("Nome progetto aggiornato.", "success")
+    return redirect(url_for("index"))
+
+
 @app.post("/clients/<client_id>/projects/<project_id>/crs")
 def add_cr(client_id: str, project_id: str):
     cr_key = sanitize_text(request.form.get("cr_key"))
