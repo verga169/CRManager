@@ -800,6 +800,20 @@
             margin-bottom: 16px;
         }
 
+        .global-board-card .kanban-column-body {
+            --global-cr-visible-limit: 10;
+            --global-cr-row-height: 56px;
+            --global-cr-row-gap: 10px;
+            max-height: calc(
+                (var(--global-cr-visible-limit) * var(--global-cr-row-height)) +
+                ((var(--global-cr-visible-limit) - 1) * var(--global-cr-row-gap))
+            );
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+            padding-right: 4px;
+        }
+
         .client-tabs {
             display: flex;
             gap: 8px;
