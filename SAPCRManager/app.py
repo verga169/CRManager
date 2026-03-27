@@ -723,6 +723,11 @@ def build_view_model(
 
             visible_projects += 1
             visible_crs += len(decorated_crs)
+            project_status_counts = {key: 0 for key in STATUS_META}
+            for item in decorated_crs:
+                project_status = normalize_status(item.get("status"))
+                project_status_counts[project_status] += 1
+
             client_projects.append(
                 {
                     "id": project["id"],
@@ -730,6 +735,7 @@ def build_view_model(
                     "crs": decorated_crs,
                     "kanban_columns": kanban_columns,
                     "cr_count": len(project.get("crs", [])),
+                    "status_counts": project_status_counts,
                     "next_release_order": next_release_order(project),
                 }
             )

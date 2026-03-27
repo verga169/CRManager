@@ -356,8 +356,20 @@
 
         .project-card {
             border: 2px solid #d6e3f0;
-            border-left: 8px solid var(--brand);
-            background: #ffffff;
+            border-left: 8px solid hsl(var(--project-accent-h, 210) 74% 45%);
+            background:
+                linear-gradient(180deg, hsl(var(--project-accent-h, 210) 85% 98%) 0%, #ffffff 42%),
+                #ffffff;
+        }
+
+        .project-tone-a {
+            --project-accent-h: 210;
+            --chip-h: 210;
+        }
+
+        .project-tone-b {
+            --project-accent-h: 224;
+            --chip-h: 224;
         }
 
         .client-head,
@@ -386,10 +398,10 @@
         }
 
         .project-head {
-            border: 1px solid #d6e3f0;
+            border: 1px solid hsl(var(--project-accent-h, 210) 52% 84%);
             border-radius: 12px;
             padding: 10px 12px;
-            background: #eff4f9;
+            background: hsl(var(--project-accent-h, 210) 78% 96%);
             margin-bottom: 8px;
         }
 
@@ -409,9 +421,9 @@
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: var(--brand-dark);
-            border: 1px solid #c9d7e6;
-            background: #eaf3fc;
+            color: hsl(var(--project-accent-h, 210) 66% 30%);
+            border: 1px solid hsl(var(--project-accent-h, 210) 48% 78%);
+            background: hsl(var(--project-accent-h, 210) 78% 94%);
             width: fit-content;
         }
 
@@ -447,6 +459,95 @@
             display: grid;
             gap: 12px;
             margin-top: 14px;
+        }
+
+        .project-list {
+            gap: 16px;
+            padding-left: 8px;
+            border-left: 3px solid #dbe7f3;
+        }
+
+        .client-project-map {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #d5deea;
+        }
+
+        .project-map-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border: 1px solid hsl(var(--chip-h, 210) 52% 82%);
+            background: hsl(var(--chip-h, 210) 90% 96%);
+            color: hsl(var(--chip-h, 210) 70% 30%);
+            border-radius: 999px;
+            padding: 6px 11px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .project-map-chip:hover {
+            background: hsl(var(--chip-h, 210) 94% 92%);
+            border-color: hsl(var(--chip-h, 210) 56% 74%);
+        }
+
+        .project-map-chip .name {
+            max-width: 240px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-map-chip .count {
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .cr-legend {
+            margin-top: 8px;
+            margin-bottom: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cr-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            border: 1px solid #d6e3f0;
+            background: #f6f9fc;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 9px;
+        }
+
+        .cr-legend-rail {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 16px;
+            border-radius: 4px;
+            font-size: 0.66rem;
+            letter-spacing: 0.03em;
+            font-weight: 800;
+            color: #0a5eb7;
+            border: 1px solid #b8d6f5;
+            background: #dcebfb;
+        }
+
+        .cr-legend-rail.cu {
+            color: #0d6b35;
+            border-color: #b7dec2;
+            background: #e2f4e8;
         }
 
         .kanban-board {
@@ -796,6 +897,62 @@
             padding-bottom: 12px;
         }
 
+        .project-card:not(.is-collapsed) .project-head {
+            position: sticky;
+            top: 8px;
+            z-index: 6;
+            box-shadow: 0 6px 16px rgba(31, 45, 61, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .project-head {
+            cursor: pointer;
+        }
+
+        .project-status-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .project-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            border: 1px solid #d6e3f0;
+            background: #f6f9fc;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+        }
+
+        .project-status-pill .value {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .project-status-pill.status-development {
+            border-color: #b7dec2;
+            background: var(--development-soft);
+            color: var(--development);
+        }
+
+        .project-status-pill.status-quality {
+            border-color: #f3d18c;
+            background: var(--quality-soft);
+            color: var(--quality);
+        }
+
+        .project-status-pill.status-production {
+            border-color: #f0b6b6;
+            background: var(--production-soft);
+            color: var(--production);
+        }
+
         .global-board-card {
             margin-bottom: 16px;
         }
@@ -1087,6 +1244,21 @@
                 grid-template-columns: 1fr;
             }
 
+            .client-project-map {
+                margin-top: 8px;
+                padding-top: 8px;
+            }
+
+            .project-map-chip {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .project-map-chip .name {
+                max-width: none;
+                flex: 1;
+            }
+
             .cr-summary-side {
                 width: 100%;
                 justify-content: space-between;
@@ -1098,6 +1270,16 @@
 
             .hero {
                 padding: 22px;
+            }
+
+            .project-list {
+                padding-left: 0;
+                border-left: 0;
+            }
+
+            .project-card:not(.is-collapsed) .project-head {
+                position: static;
+                top: auto;
             }
         }
     </style>
@@ -1226,6 +1408,16 @@
                                         <span class="pill pill-development">{{ client.project_count }} progetti</span>
                                         <span class="pill pill-quality">{{ client.cr_count }} CR totali</span>
                                     </div>
+                                    {% if client.projects %}
+                                    <div class="client-project-map" aria-label="Mappa progetti cliente {{ client.name }}">
+                                        {% for project in client.projects %}
+                                        <a class="project-map-chip project-tone-{{ 'a' if loop.index0 % 2 == 0 else 'b' }}" href="#project-{{ client.id }}-{{ project.id }}">
+                                            <span class="name">{{ project.name }}</span>
+                                            <span class="count">{{ project.cr_count }} CR</span>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <form method="post" action="{{ url_for('delete_client', client_id=client.id) }}" onsubmit="return confirm('Eliminare il cliente e tutti i suoi progetti?');">
                                     <button class="btn btn-danger" type="submit">Elimina cliente</button>
@@ -1249,7 +1441,7 @@
 
                         <div class="project-list">
                             {% for project in client.projects %}
-                            <article id="project-{{ client.id }}-{{ project.id }}" class="project-card is-collapsed">
+                            <article id="project-{{ client.id }}-{{ project.id }}" class="project-card is-collapsed project-tone-{{ 'a' if loop.index0 % 2 == 0 else 'b' }}">
                                 <div class="project-head">
                                     <div class="project-title">
                                         <span class="project-chip">Progetto</span>
@@ -1259,6 +1451,11 @@
                                         </div>
                                         <div class="meta-row">
                                             <span class="pill pill-development">{{ project.cr_count }} CR nel progetto</span>
+                                        </div>
+                                        <div class="project-status-strip" aria-label="Distribuzione stati progetto {{ project.name }}">
+                                            <span class="project-status-pill status-development">Sviluppo <span class="value">{{ project.status_counts.development }}</span></span>
+                                            <span class="project-status-pill status-quality">Quality <span class="value">{{ project.status_counts.quality }}</span></span>
+                                            <span class="project-status-pill status-production">Produzione <span class="value">{{ project.status_counts.production }}</span></span>
                                         </div>
                                     </div>
                                     <div class="project-tools">
@@ -1320,6 +1517,13 @@
                                         <button class="btn btn-brand" type="submit">Aggiungi CR</button>
                                     </div>
                                 </form>
+
+                                <div class="cr-legend" aria-label="Struttura card CR progetto {{ project.name }}">
+                                    <span class="cr-legend-item"><span class="cr-legend-rail">WB</span> Workbench</span>
+                                    <span class="cr-legend-item"><span class="cr-legend-rail cu">CU</span> Customizing</span>
+                                    <span class="cr-legend-item">Richiesta + Descrizione</span>
+                                    <span class="cr-legend-item">Drag and drop stato</span>
+                                </div>
 
                                 <div class="kanban-board">
                                     {% for column in project.kanban_columns %}
@@ -1517,6 +1721,7 @@
             const draggableCards = document.querySelectorAll('.kanban-dropzone .kanban-draggable');
             const dropzones = document.querySelectorAll('.kanban-dropzone[data-board-scope="project"]');
             const projectToggles = document.querySelectorAll('[data-project-toggle]');
+            const projectHeads = document.querySelectorAll('.project-head');
             const crToggleAreas = document.querySelectorAll('[data-cr-toggle]');
             const openDetailButtons = document.querySelectorAll('[data-open-detail]');
             const openClientDialogButton = document.getElementById('open-client-dialog');
@@ -2155,6 +2360,22 @@
                     const targetId = toggle.dataset.projectToggle;
                     const projectCard = document.getElementById(targetId);
                     if (!projectCard) {
+                        return;
+                    }
+
+                    const isCollapsed = projectCard.classList.contains('is-collapsed');
+                    setProjectCollapsed(projectCard, !isCollapsed);
+                });
+            });
+
+            projectHeads.forEach((head) => {
+                head.addEventListener('click', (event) => {
+                    if (event.target.closest('button, a, form, input, textarea, select, .project-tools')) {
+                        return;
+                    }
+
+                    const projectCard = head.closest('.project-card');
+                    if (!projectCard || !projectCard.id) {
                         return;
                     }
 
