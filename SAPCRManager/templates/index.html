@@ -2200,7 +2200,7 @@
                     return;
                 }
 
-                const payload = `ID CR: ${crKey}\nDescrizione: ${description}\nCreato da: ${createdBy}`;
+                const payload = `${crKey} - ${description} - ${createdBy}`;
 
                 try {
                     await navigator.clipboard.writeText(payload);
