@@ -746,6 +746,49 @@
             font-weight: 700;
         }
 
+        .kanban-column-tools {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .column-copy-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            border: 1px solid #d5deea;
+            background: #f8fafc;
+            color: #465468;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .column-copy-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .column-copy-btn:hover {
+            border-color: #bdcbdd;
+            background: #ecf2f8;
+            color: #2f3f56;
+        }
+
+        .column-copy-btn.is-copied {
+            border-color: #b7dec2;
+            background: #e6f5ea;
+            color: #1f7a43;
+        }
+
         .kanban-column-body {
             display: grid;
             gap: 10px;
@@ -1602,7 +1645,15 @@
                                 <div class="kanban-column-title">
                                     <span class="pill pill-{{ column.tone }}">{{ column.label }}</span>
                                 </div>
-                                <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                                <div class="kanban-column-tools">
+                                    <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                                    <button type="button" class="column-copy-btn" data-copy-column-crs data-status-label="{{ column.label }}" title="Copia tutte le CR in {{ column.label }}" aria-label="Copia tutte le CR in {{ column.label }}">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                                            <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div class="kanban-column-body">
                                 {% if column.crs %}
@@ -1617,7 +1668,7 @@
                                                 </div>
                                                 <div class="cr-summary-field">
                                                     <p class="cr-summary-label">Descrizione</p>
-                                                    <p class="cr-name cr-summary-value">{{ cr.description }}</p>
+                                                    <p class="cr-name cr-summary-value" title="{{ cr.description }}">{{ cr.description }}</p>
                                                 </div>
                                             </div>
                                             <div class="cr-summary-side">
@@ -1796,7 +1847,15 @@
                                             <div class="kanban-column-title">
                                                 <span class="pill pill-{{ column.tone }}">{{ column.label }}</span>
                                             </div>
-                                            <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                                            <div class="kanban-column-tools">
+                                                <span class="pill pill-{{ column.tone }}">{{ column.crs|length }}</span>
+                                                <button type="button" class="column-copy-btn" data-copy-column-crs data-status-label="{{ column.label }}" title="Copia tutte le CR in {{ column.label }}" aria-label="Copia tutte le CR in {{ column.label }}">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                        <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                                                        <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="kanban-column-body">
@@ -1812,7 +1871,7 @@
                                                             </div>
                                                             <div class="cr-summary-field">
                                                                 <p class="cr-summary-label">Descrizione</p>
-                                                                <p class="cr-name cr-summary-value">{{ cr.description }}</p>
+                                                                <p class="cr-name cr-summary-value" title="{{ cr.description }}">{{ cr.description }}</p>
                                                             </div>
                                                         </div>
                                                         <div class="cr-summary-side">
@@ -2045,6 +2104,7 @@
             const crToggleAreas = document.querySelectorAll('[data-cr-toggle]');
             const openDetailButtons = document.querySelectorAll('[data-open-detail]');
             const copyCrButtons = document.querySelectorAll('[data-copy-cr]');
+            const copyColumnButtons = document.querySelectorAll('[data-copy-column-crs]');
             const globalBoardCard = document.querySelector('.global-board-card');
             const globalBoardToggle = document.querySelector('[data-global-board-toggle]');
             const openClientDialogButton = document.getElementById('open-client-dialog');
@@ -2208,6 +2268,50 @@
                     button.classList.add('is-copied');
                     button.setAttribute('title', 'Copiato');
                     showToast('CR copiata negli appunti', 'success');
+                    window.setTimeout(() => {
+                        button.classList.remove('is-copied');
+                        button.setAttribute('title', previousTitle);
+                    }, 1000);
+                } catch (_error) {
+                    showToast('Impossibile copiare negli appunti', 'error');
+                }
+            };
+
+            const sanitizeClipboardCell = (value) => {
+                return (value || '').replace(/[\t\n\r]+/g, ' ').trim();
+            };
+
+            const copyColumnCrDetails = async (button) => {
+                const column = button.closest('.kanban-column');
+                if (!column) {
+                    return;
+                }
+
+                const cards = Array.from(column.querySelectorAll('.kanban-column-body .cr-item'));
+                if (!cards.length) {
+                    showToast('Nessuna CR da copiare in questa colonna', 'error');
+                    return;
+                }
+
+                const rows = cards.map((card) => {
+                    const crKey = sanitizeClipboardCell(card.dataset.copyCrKey);
+                    const description = sanitizeClipboardCell(card.dataset.copyDescription);
+                    const createdBy = sanitizeClipboardCell(card.dataset.copyCreatedBy);
+                    return `${crKey}\t${description}\t${createdBy}`;
+                });
+
+                const payload = rows.join('\n');
+
+                try {
+                    await navigator.clipboard.writeText(payload);
+                    const statusLabel = button.dataset.statusLabel || 'ambiente';
+                    const previousTitle = button.getAttribute('title') || 'Copia tutte le CR';
+                    button.classList.add('is-copied');
+                    button.setAttribute('title', 'Copiato');
+                    const message = cards.length === 1
+                        ? `1 CR copiata da ${statusLabel}`
+                        : `${cards.length} CR copiate da ${statusLabel}`;
+                    showToast(message, 'success');
                     window.setTimeout(() => {
                         button.classList.remove('is-copied');
                         button.setAttribute('title', previousTitle);
@@ -2577,6 +2681,14 @@
                     event.preventDefault();
                     event.stopPropagation();
                     copyCrDetails(button);
+                });
+            });
+
+            copyColumnButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    copyColumnCrDetails(button);
                 });
             });
 
